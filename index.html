@@ -1231,6 +1231,192 @@
                     </div>
                 </section>
 
+                <!-- ═══ 9. View: Unique & Premium Cyber SOC Authentication Portal ═══ -->
+                <section class="dashboard-view-section auth-portal-section" id="view-auth" style="display: none;">
+                    
+                    <div class="auth-portal-grid">
+                        
+                        <!-- Left Hero Column: Cyber Defense Command Showcase -->
+                        <div class="auth-portal-showcase">
+                            <div class="auth-showcase-bg" style="background-image: url('soc_portal_hero.jpg');" aria-hidden="true"></div>
+                            <div class="auth-showcase-overlay"></div>
+                            
+                            <div class="auth-showcase-content">
+                                <div class="auth-protocol-pills">
+                                    <span class="ev-badge-chip ev-chip--gold">DEFCON-1 ENCRYPTION</span>
+                                    <span class="ev-badge-chip ev-chip--crit">RESTRICTED SOC ACCESS</span>
+                                    <span class="ev-badge-chip ev-chip--sample">SUPABASE CLOUD LIVE</span>
+                                </div>
+
+                                <div class="auth-showcase-title-box">
+                                    <div class="auth-insignia-row">
+                                        <div class="auth-insignia-icon">
+                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2">
+                                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                            </svg>
+                                        </div>
+                                        <span class="auth-insignia-label">THREAT STORM INTELLIGENCE</span>
+                                    </div>
+                                    <h1 class="auth-portal-heading">
+                                        Planetary Cyber Defense Command Portal
+                                    </h1>
+                                    <p class="auth-portal-lead">
+                                        Authenticate to access real-time satellite telemetry, deterministic EvidenceChain graphs, and deep neural APT triage feeds.
+                                    </p>
+                                </div>
+
+                                <!-- Live Telemetry Pipeline Status -->
+                                <div class="auth-telemetry-hud">
+                                    <div class="auth-hud-header">
+                                        <span class="auth-hud-dot"></span>
+                                        <span class="auth-hud-title">LIVE INGESTION MATRIX</span>
+                                        <span class="auth-hud-latency">&lt; 1.2ms</span>
+                                    </div>
+                                    <div class="auth-hud-stats">
+                                        <div class="auth-hud-stat">
+                                            <span class="hud-stat-num">28</span>
+                                            <span class="hud-stat-lbl">Active Intercepts</span>
+                                        </div>
+                                        <div class="auth-hud-stat">
+                                            <span class="hud-stat-num">100%</span>
+                                            <span class="hud-stat-lbl">Chain Integrity</span>
+                                        </div>
+                                        <div class="auth-hud-stat">
+                                            <span class="hud-stat-num">4096-bit</span>
+                                            <span class="hud-stat-lbl">Key Exchange</span>
+                                        </div>
+                                    </div>
+                                    <div class="auth-hud-stream">
+                                        <code>[PROBE-AP-01] SYN Packet verified // AMSI memory stream quarantined // Volt Typhoon cluster tracked</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Form Column: Haute Clearance Terminal -->
+                        <div class="auth-portal-terminal-wrapper">
+                            <div class="auth-portal-terminal">
+                                
+                                <div class="terminal-top-bar">
+                                    <div class="terminal-dots">
+                                        <span class="t-dot t-dot--red"></span>
+                                        <span class="t-dot t-dot--gold"></span>
+                                        <span class="t-dot t-dot--cyan"></span>
+                                    </div>
+                                    <div class="terminal-session-tag">STORM-SEC-GATEWAY-v2.5</div>
+                                </div>
+
+                                <div class="terminal-header">
+                                    <h2 class="terminal-title">Analyst Authentication</h2>
+                                    <p class="terminal-subtitle">Select credential verification protocol</p>
+                                </div>
+
+                                <!-- Segmented Tab Switcher -->
+                                <div class="portal-auth-tabs">
+                                    <button type="button" class="portal-tab-btn portal-tab--active" id="portal-tab-signin">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
+                                        </svg>
+                                        <span>Sign In</span>
+                                    </button>
+                                    <button type="button" class="portal-tab-btn" id="portal-tab-signup">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
+                                        </svg>
+                                        <span>Register Access</span>
+                                    </button>
+                                </div>
+
+                                <!-- Authentication Form -->
+                                <form id="portal-auth-form" class="portal-form" onsubmit="return false;">
+                                    
+                                    <!-- Callsign (Sign Up Only) -->
+                                    <div class="portal-input-group" id="portal-group-callsign" style="display: none;">
+                                        <label for="portal-input-callsign">
+                                            <span>Analyst Callsign</span>
+                                            <span class="label-badge">REQUIRED</span>
+                                        </label>
+                                        <div class="portal-input-box">
+                                            <span class="input-icon">👤</span>
+                                            <input type="text" id="portal-input-callsign" placeholder="e.g., Commander Yash K." autocomplete="name">
+                                        </div>
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div class="portal-input-group">
+                                        <label for="portal-input-email">
+                                            <span>SOC Work Email</span>
+                                            <span class="label-badge">ENCRYPTED</span>
+                                        </label>
+                                        <div class="portal-input-box">
+                                            <span class="input-icon">✉️</span>
+                                            <input type="email" id="portal-input-email" placeholder="analyst@threatstorm.defense" required autocomplete="email">
+                                        </div>
+                                    </div>
+
+                                    <!-- Password -->
+                                    <div class="portal-input-group">
+                                        <div class="portal-label-row">
+                                            <label for="portal-input-password">
+                                                <span>Security Key / Token</span>
+                                                <span class="label-badge">256-BIT</span>
+                                            </label>
+                                            <button type="button" id="portal-btn-toggle-pass" class="portal-text-btn">Show</button>
+                                        </div>
+                                        <div class="portal-input-box">
+                                            <span class="input-icon">🔑</span>
+                                            <input type="password" id="portal-input-password" placeholder="••••••••••••••••" required autocomplete="current-password">
+                                        </div>
+                                    </div>
+
+                                    <!-- Primary Submit Button -->
+                                    <button type="button" class="portal-btn-primary" id="portal-btn-submit">
+                                        <span id="portal-submit-label">⚡ Authenticate &amp; Access Command Grid</span>
+                                    </button>
+
+                                    <!-- Luxury Divider -->
+                                    <div class="portal-divider">
+                                        <span>OR 1-CLICK INSTANT CLEARANCE</span>
+                                    </div>
+
+                                    <!-- Demo Clearance Button -->
+                                    <button type="button" class="portal-btn-demo" id="portal-btn-demo">
+                                        <div class="demo-btn-left">
+                                            <span class="demo-shield">🛡️</span>
+                                            <div class="demo-text">
+                                                <span class="demo-title">Commander Yash K. Clearance</span>
+                                                <span class="demo-subtitle">SOC Level 5 • Full Admin Rights</span>
+                                            </div>
+                                        </div>
+                                        <span class="demo-arrow">→</span>
+                                    </button>
+
+                                    <!-- Back to Map link -->
+                                    <div style="text-align: center; margin-top: 14px;">
+                                        <button type="button" class="portal-back-btn" id="portal-btn-back">
+                                            <span>← Return to Planetary Threat Map (Guest Mode)</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Feedback Alert Box -->
+                                    <div id="portal-feedback-box" class="portal-feedback-box" style="display: none;"></div>
+                                </form>
+
+                                <!-- Security Footer -->
+                                <div class="terminal-footer">
+                                    <div class="terminal-footer-line">
+                                        <span class="t-shield-mini">🔒</span>
+                                        <span>Connected to Supabase PostgreSQL cluster (vlwdxlwmljigbxncxqdm)</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </section>
+
             </main>
 
             <!-- ═══ Footer ═══ -->

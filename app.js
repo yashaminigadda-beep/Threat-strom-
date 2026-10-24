@@ -1064,7 +1064,8 @@
         sector: ['view-sector'],
         reports: ['view-reports'],
         settings: ['view-settings'],
-        alerts: ['view-alerts']
+        alerts: ['view-alerts'],
+        auth: ['view-auth']
     };
 
     function switchAppView(viewName) {
@@ -1082,7 +1083,8 @@
             'view-sector',
             'view-reports',
             'view-settings',
-            'view-alerts'
+            'view-alerts',
+            'view-auth'
         ];
 
         allSectionIds.forEach(id => {
@@ -1856,16 +1858,14 @@
             }
         }
 
-        // Open Modal
-        if (btnOpenAuth && authModal) {
+        // Open Dedicated Full-Page Cyber SOC Portal
+        if (btnOpenAuth) {
             btnOpenAuth.addEventListener('click', () => {
-                authModal.style.display = 'flex';
-                if (feedback) feedback.style.display = 'none';
-                setTimeout(() => { if (inputEmail) inputEmail.focus(); }, 100);
+                switchAppView('auth');
             });
         }
 
-        // Close Modal
+        // Close Modal fallback
         function closeAuthModal() {
             if (authModal) authModal.style.display = 'none';
         }
@@ -1877,7 +1877,7 @@
             });
         }
 
-        // Tabs
+        // Modal Tabs
         if (tabSignIn && tabSignUp) {
             tabSignIn.addEventListener('click', () => {
                 authMode = 'signin';
@@ -1898,7 +1898,7 @@
             });
         }
 
-        // Password Show/Hide
+        // Modal Password Show/Hide
         if (btnTogglePass && inputPassword) {
             btnTogglePass.addEventListener('click', () => {
                 const isPass = inputPassword.type === 'password';
@@ -1907,7 +1907,7 @@
             });
         }
 
-        // Form Submit
+        // Modal Form Submit
         if (btnSubmit) {
             btnSubmit.addEventListener('click', async () => {
                 const email = inputEmail.value.trim();
@@ -1939,6 +1939,7 @@
                     } else {
                         updateAuthUI();
                         closeAuthModal();
+                        switchAppView('planetary');
                         showToast(`✓ Welcome, ${result.user.callsign}! Access Clearance Verified.`);
                     }
                 } else {
@@ -1947,13 +1948,128 @@
             });
         }
 
-        // Instant Demo Login
+        // Modal Instant Demo Login
         if (btnDemo) {
             btnDemo.addEventListener('click', () => {
                 const demoUser = window.ThreatStormSupabase.loginDemoAnalyst();
                 updateAuthUI();
                 closeAuthModal();
+                switchAppView('planetary');
                 showToast(`✓ Access Granted: ${demoUser.callsign} (${demoUser.clearance})`);
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // DEDICATED FULL-PAGE AUTHENTICATION PORTAL ENGINE (#view-auth)
+        // ═══════════════════════════════════════════════════════════
+
+        const portalTabSignIn = document.getElementById('portal-tab-signin');
+        const portalTabSignUp = document.getElementById('portal-tab-signup');
+        const portalGroupCallsign = document.getElementById('portal-group-callsign');
+        const portalInputCallsign = document.getElementById('portal-input-callsign');
+        const portalInputEmail = document.getElementById('portal-input-email');
+        const portalInputPass = document.getElementById('portal-input-password');
+        const portalBtnTogglePass = document.getElementById('portal-btn-toggle-pass');
+        const portalBtnSubmit = document.getElementById('portal-btn-submit');
+        const portalSubmitLabel = document.getElementById('portal-submit-label');
+        const portalBtnDemo = document.getElementById('portal-btn-demo');
+        const portalBtnBack = document.getElementById('portal-btn-back');
+        const portalFeedback = document.getElementById('portal-feedback-box');
+
+        let portalMode = 'signin';
+
+        function showPortalFeedback(msg, type) {
+            if (!portalFeedback) return;
+            portalFeedback.style.display = 'block';
+            portalFeedback.style.background = type === 'error' ? 'rgba(239, 68, 68, 0.14)' : (type === 'warn' ? 'rgba(212, 175, 55, 0.14)' : 'rgba(62, 207, 142, 0.14)');
+            portalFeedback.style.border = `1px solid ${type === 'error' ? '#ef4444' : (type === 'warn' ? '#d4af37' : '#3ECF8E')}`;
+            portalFeedback.style.color = type === 'error' ? '#fca5a5' : (type === 'warn' ? '#fde047' : '#86efac');
+            portalFeedback.innerHTML = msg;
+        }
+
+        if (portalTabSignIn && portalTabSignUp) {
+            portalTabSignIn.addEventListener('click', () => {
+                portalMode = 'signin';
+                portalTabSignIn.classList.add('portal-tab--active');
+                portalTabSignUp.classList.remove('portal-tab--active');
+                if (portalGroupCallsign) portalGroupCallsign.style.display = 'none';
+                if (portalSubmitLabel) portalSubmitLabel.textContent = '⚡ Authenticate & Access Command Grid';
+                if (portalFeedback) portalFeedback.style.display = 'none';
+            });
+
+            portalTabSignUp.addEventListener('click', () => {
+                portalMode = 'signup';
+                portalTabSignUp.classList.add('portal-tab--active');
+                portalTabSignIn.classList.remove('portal-tab--active');
+                if (portalGroupCallsign) portalGroupCallsign.style.display = 'flex';
+                if (portalSubmitLabel) portalSubmitLabel.textContent = '🛡️ Register Callsign & Access Grid';
+                if (portalFeedback) portalFeedback.style.display = 'none';
+            });
+        }
+
+        if (portalBtnTogglePass && portalInputPass) {
+            portalBtnTogglePass.addEventListener('click', () => {
+                const isPass = portalInputPass.type === 'password';
+                portalInputPass.type = isPass ? 'text' : 'password';
+                portalBtnTogglePass.textContent = isPass ? 'Hide' : 'Show';
+            });
+        }
+
+        if (portalBtnSubmit) {
+            portalBtnSubmit.addEventListener('click', async () => {
+                const email = portalInputEmail.value.trim();
+                const password = portalInputPass.value;
+                const callsign = portalInputCallsign ? portalInputCallsign.value.trim() : '';
+
+                if (!email || !password) {
+                    showPortalFeedback('⚠️ Please provide your SOC email and security key.', 'warn');
+                    return;
+                }
+
+                portalBtnSubmit.disabled = true;
+                portalBtnSubmit.innerHTML = '<span>⏳ Verifying Cryptographic Clearance...</span>';
+
+                let result;
+                if (portalMode === 'signup') {
+                    result = await window.ThreatStormSupabase.signUp(email, password, callsign);
+                } else {
+                    result = await window.ThreatStormSupabase.signIn(email, password);
+                }
+
+                portalBtnSubmit.disabled = false;
+                portalBtnSubmit.innerHTML = `<span>${portalMode === 'signup' ? '🛡️ Register Callsign & Access Grid' : '⚡ Authenticate & Access Command Grid'}</span>`;
+
+                if (result.success) {
+                    if (result.confirmationRequired) {
+                        showPortalFeedback(`✓ ${result.message}`, 'warn');
+                        showToast('✉ Check email for verification link.');
+                    } else {
+                        updateAuthUI();
+                        showToast(`✓ Clearance Verified: Welcome, ${result.user.callsign}!`);
+                        setTimeout(() => {
+                            switchAppView('planetary');
+                        }, 400);
+                    }
+                } else {
+                    showPortalFeedback(`✕ Authentication failed: ${result.message}`, 'error');
+                }
+            });
+        }
+
+        if (portalBtnDemo) {
+            portalBtnDemo.addEventListener('click', () => {
+                const demoUser = window.ThreatStormSupabase.loginDemoAnalyst();
+                updateAuthUI();
+                showToast(`✓ Level 5 SOC Clearance Granted: ${demoUser.callsign}`);
+                setTimeout(() => {
+                    switchAppView('planetary');
+                }, 300);
+            });
+        }
+
+        if (portalBtnBack) {
+            portalBtnBack.addEventListener('click', () => {
+                switchAppView('planetary');
             });
         }
 
