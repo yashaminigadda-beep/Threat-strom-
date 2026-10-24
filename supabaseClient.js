@@ -7,6 +7,7 @@
     const STORAGE_KEY_URL = 'threatstorm_sb_url';
     const STORAGE_KEY_KEY = 'threatstorm_sb_key';
     const DEFAULT_URL = 'https://vlwdxlwmljigbxncxqdm.supabase.co';
+    const DEFAULT_KEY = 'sb_publishable_U0ECEE9mpLSQe4z8DwnVLA_fdU6vwnG';
 
     let supabaseInstance = null;
     let isConnected = false;
@@ -19,7 +20,7 @@
     // Retrieve stored credentials or pre-configured environment
     function getConfig() {
         const rawUrl = localStorage.getItem(STORAGE_KEY_URL) || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) || DEFAULT_URL;
-        const key = localStorage.getItem(STORAGE_KEY_KEY) || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.key) || '';
+        const key = localStorage.getItem(STORAGE_KEY_KEY) || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.key) || DEFAULT_KEY;
         return { url: normalizeUrl(rawUrl), key: key.trim() };
     }
 
@@ -69,11 +70,15 @@
 
             if (error) {
                 // If table doesn't exist yet, it's still a valid connection to project
-                if (error.code === '42P01') {
+                if (error.code === '42P01' || error.code === 'PGRST205' || (error.message && error.message.includes('schema cache'))) {
+                    localStorage.setItem(STORAGE_KEY_URL, url);
+                    localStorage.setItem(STORAGE_KEY_KEY, key);
+                    supabaseInstance = tempClient;
+                    isConnected = true;
                     return {
                         success: true,
                         latency,
-                        warning: 'Connected to Supabase, but "threats" table not found. Please run supabase_schema.sql in SQL Editor.'
+                        warning: 'Connected to Supabase! Now run supabase_schema.sql in your Supabase SQL Editor.'
                     };
                 }
                 return {
