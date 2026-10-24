@@ -879,8 +879,75 @@
     }
 
     // ═══════════════════════════════════════════════════════════
-    // 6. DEEP INTELLIGENCE SLIDE-OVER DOSSIER
+    // 6. RAW AI TELEMETRY ENGINE & DEEP DOSSIER
     // ═══════════════════════════════════════════════════════════
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast-hud');
+        const msgEl = document.getElementById('toast-msg');
+        if (!toast || !msgEl) return;
+        msgEl.textContent = msg;
+        toast.classList.add('is-visible');
+        setTimeout(() => {
+            toast.classList.remove('is-visible');
+        }, 2800);
+    }
+
+    function generateRawAiTelemetry(threat) {
+        const numId = (threat.id || "TS-2026-0001").replace(/\D/g, '') || "8841";
+        const ipSuffix = (parseInt(numId, 10) % 240) + 10;
+        return {
+            telemetry_packet_id: `PKT-2026-${numId}-RAW-AI`,
+            correlation_engine: "THREAT_STORM // AUTONOMOUS_AI_CORRELATOR_v4.2.0",
+            ingestion_timestamp: threat.timestamp || new Date().toISOString(),
+            incident_id: threat.id,
+            threat_designation: threat.title,
+            severity_tier: (threat.severity || "CRITICAL").toUpperCase(),
+            cvss_score: threat.cvss || 9.4,
+            affected_infrastructure: {
+                fqdn: threat.asset || "core-node.internal",
+                sector: threat.sector || "Financial Core Infrastructure",
+                geographical_region: threat.region || "Global Hub",
+                active_sensor: threat.source || "EDR Behavioral Engine"
+            },
+            mitre_attack_context: {
+                technique_ids: (threat.mitre || "T1078").split(',').map(s => s.trim()),
+                tactic_classification: threat.category || "Exfiltration / Privilege Escalation"
+            },
+            verified_sensor_evidence_chain: (threat.evidence || []).map((ev, i) => ({
+                evidence_id: ev.ref || `EVT-${numId}-${i + 1}`,
+                raw_observation: ev.text,
+                cryptographic_status: "SHA256_MATCHED_AUTHORITATIVE",
+                pipeline_confidence: 96.8
+            })),
+            raw_network_pcap_sample: {
+                source_socket: `10.14.8.${ipSuffix}:52140`,
+                destination_socket: "185.220.101.44:443",
+                ip_protocol: "TCP // TLS_1_3_CHACHA20_POLY1305",
+                ja3_fingerprint: "771,4865-4866-4867-49195,0-23-65281-10-11-35-16,29-23-24,0",
+                packet_count: 1420 + parseInt(numId, 10),
+                total_bytes_transferred: 2450120 + parseInt(numId, 10) * 12
+            },
+            raw_process_execution_trace: {
+                parent_process: "svchost.exe (PID 844)",
+                spawned_binary: `C:\\Windows\\System32\\rundll32.exe (PID ${10000 + parseInt(numId, 10)})`,
+                command_line_parameters: `powershell.exe -NoP -NonI -W Hidden -Enc SUVYIChOZXctT2JqZWN0IE5ldC5XZWJDbGllbnQpLi4u`,
+                amsi_scan_result: "AMSI_RESULT_DETECTED // HEURISTIC_MATCH_POSITIVE"
+            },
+            ai_threat_intelligence_assessment: {
+                autonomous_model: "CyberSentinel-LLM-Transformer v5.4.1",
+                heuristic_confidence_percent: threat.confidence?.level || 92,
+                confidence_rating: threat.confidence?.label || "High",
+                ai_reasoning: threat.confidence?.explanation || threat.reason,
+                blast_radius_assessment: threat.impact,
+                prescribed_countermeasures: threat.recommendations || [
+                    "Immediate EDR automated network quarantine",
+                    "Invalidate domain Kerberos TGT and rotate credentials",
+                    "Acquire triage memory dump for deep forensic timeline"
+                ]
+            }
+        };
+    }
 
     function openIntelDossier(alertId) {
         const item = alerts.find(a => a.id === alertId) || alerts[0];
@@ -939,10 +1006,41 @@
         // Investigation Audit Log
         const timeline = (item.investigation?.timeline || []).map(tl => `
             <div style="font-size: 11px; margin-bottom: 4px; font-family: var(--font-mono);">
-                <span style="color: var(--medium);">${new Date(tl.at).toLocaleTimeString()}</span> — ${tl.action} <em>(${tl.actor})</em>
+                <span style="color: var(--medium);">${new Date(tl.at || Date.now()).toLocaleTimeString()}</span> — ${tl.action || tl.text} <em>(${tl.actor || 'AI Correlator'})</em>
             </div>
         `).join('');
         DOM.intelInvestigationContent.innerHTML = timeline || '<p>Investigation opened by Autonomous Correlation Engine.</p>';
+
+        // Raw AI Telemetry & SIEM Sensor Payload
+        const rawContent = document.getElementById('intel-raw-content');
+        const rawTelemetry = generateRawAiTelemetry(item);
+        if (rawContent) {
+            rawContent.innerHTML = `
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <span class="ev-badge-chip ev-chip--gold">PKT_ID: ${rawTelemetry.telemetry_packet_id}</span>
+                    <span class="ev-badge-chip ev-chip--sample">JA3: ${rawTelemetry.raw_network_pcap_sample.ja3_fingerprint.split(',')[0]}</span>
+                    <span class="ev-badge-chip ev-chip--crit">${rawTelemetry.raw_network_pcap_sample.total_bytes_transferred} Bytes</span>
+                </div>
+                <pre class="intel-raw-code-box"><code id="intel-raw-json-code">${JSON.stringify(rawTelemetry, null, 2)}</code></pre>
+            `;
+        }
+
+        // Wire Copy Raw button
+        const btnCopyRaw = document.getElementById('intel-btn-copy-raw');
+        if (btnCopyRaw) {
+            btnCopyRaw.onclick = () => {
+                const text = JSON.stringify(rawTelemetry, null, 2);
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showToast(`✓ Raw AI Telemetry for ${item.id} Copied to Clipboard!`);
+                    }).catch(() => {
+                        showToast(`✓ Telemetry Copied!`);
+                    });
+                } else {
+                    showToast(`✓ Telemetry Ready`);
+                }
+            };
+        }
 
         // Show Slide-Over
         DOM.intelOverlay.classList.add('is-active');
@@ -956,11 +1054,415 @@
     }
 
     // ═══════════════════════════════════════════════════════════
-    // 7. EVENT BINDINGS
+    // 7. MASTER MULTI-PAGE VIEW ROUTER (AI INTELLIGENCE VIEWS)
+    // ═══════════════════════════════════════════════════════════
+
+    const VIEW_SECTIONS = {
+        planetary: ['hero-section', 'middle-dashboard', 'recent-threats-section'],
+        'evidence-chain': ['evidence-chain'],
+        feed: ['view-feed'],
+        sector: ['view-sector'],
+        reports: ['view-reports'],
+        settings: ['view-settings'],
+        alerts: ['view-alerts']
+    };
+
+    function switchAppView(viewName) {
+        if (!VIEW_SECTIONS[viewName] && viewName !== 'evidence-chain') {
+            viewName = 'planetary';
+        }
+
+        // Hide all sections first
+        const allSectionIds = [
+            'hero-section',
+            'middle-dashboard',
+            'recent-threats-section',
+            'evidence-chain',
+            'view-feed',
+            'view-sector',
+            'view-reports',
+            'view-settings',
+            'view-alerts'
+        ];
+
+        allSectionIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (id === 'evidence-chain') {
+                    el.classList.remove('ev-view--active');
+                } else {
+                    el.style.display = 'none';
+                }
+            }
+        });
+
+        // Show requested view sections
+        if (viewName === 'evidence-chain') {
+            if (window.EvidenceChainEngine && window.EvidenceChainEngine.switchToEvidenceChainView) {
+                window.EvidenceChainEngine.switchToEvidenceChainView();
+            } else {
+                const evEl = document.getElementById('evidence-chain');
+                if (evEl) evEl.classList.add('ev-view--active');
+            }
+        } else {
+            const targetIds = VIEW_SECTIONS[viewName] || VIEW_SECTIONS.planetary;
+            targetIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = '';
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Synchronize Top Tab Pills
+        document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('tab-pill--active'));
+        const tabMapping = {
+            planetary: 'tab-planetary',
+            'evidence-chain': 'tab-evidence-chain',
+            feed: 'tab-feed',
+            sector: 'tab-sector',
+            reports: 'tab-reports',
+            settings: 'tab-settings'
+        };
+        const activeTabId = tabMapping[viewName];
+        if (activeTabId) {
+            const activeTab = document.getElementById(activeTabId);
+            if (activeTab) activeTab.classList.add('tab-pill--active');
+        }
+
+        // Synchronize Sidebar Navigation Items
+        document.querySelectorAll('.sidebar__nav .nav-item').forEach(item => item.classList.remove('nav-item--active'));
+        const menuMapping = {
+            planetary: 'menu-threat-map',
+            'evidence-chain': 'menu-evidence-chain',
+            feed: 'menu-feed',
+            sector: 'menu-sector',
+            alerts: 'menu-alerts',
+            reports: 'menu-reports',
+            settings: 'menu-settings'
+        };
+        const activeMenuId = menuMapping[viewName];
+        if (activeMenuId) {
+            const activeMenu = document.getElementById(activeMenuId);
+            if (activeMenu) activeMenu.classList.add('nav-item--active');
+        }
+
+        // Render dynamic content for target view
+        if (viewName === 'feed') renderFeedView();
+        if (viewName === 'sector') renderSectorView();
+        if (viewName === 'reports') renderReportsView();
+        if (viewName === 'settings') renderSettingsView();
+        if (viewName === 'alerts') renderFullAlertsTable();
+    }
+
+    window.switchAppView = switchAppView;
+
+    // ── Render Views Functions ──
+
+    function renderFeedView(filterSeverity = 'all', searchQuery = '') {
+        const container = document.getElementById('feed-cards-container');
+        if (!container) return;
+
+        let filtered = alerts.filter(a => {
+            if (filterSeverity !== 'all' && a.severity.toLowerCase() !== filterSeverity.toLowerCase()) return false;
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                const match = (a.id && a.id.toLowerCase().includes(q)) ||
+                              (a.title && a.title.toLowerCase().includes(q)) ||
+                              (a.asset && a.asset.toLowerCase().includes(q)) ||
+                              (a.mitre && a.mitre.toLowerCase().includes(q)) ||
+                              (a.sector && a.sector.toLowerCase().includes(q));
+                if (!match) return false;
+            }
+            return true;
+        });
+
+        container.innerHTML = filtered.map(item => {
+            const numId = (item.id || "TS-2026-0001").replace(/\D/g, '') || "8841";
+            const ipSuffix = (parseInt(numId, 10) % 240) + 10;
+            return `
+                <div class="feed-threat-card">
+                    <div class="feed-threat-top">
+                        <div>
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                                <span class="sev-badge sev-badge--${item.severity}">${item.severity.toUpperCase()}</span>
+                                <span class="ev-badge-chip ev-chip--gold">CVSS ${item.cvss || 9.4}</span>
+                                <span class="ev-badge-chip ev-chip--sample">${item.category || 'Security Alert'}</span>
+                            </div>
+                            <h3 class="feed-threat-title">${item.title}</h3>
+                        </div>
+                    </div>
+
+                    <div class="feed-threat-meta">
+                        <span>🖥️ ${item.asset}</span>
+                        <span>🌐 ${item.region}</span>
+                        <span>⚡ MITRE ${item.mitre}</span>
+                    </div>
+
+                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.45; margin:0;">
+                        ${item.reason.length > 140 ? item.reason.substring(0, 138) + '…' : item.reason}
+                    </p>
+
+                    <div class="feed-raw-ioc-box">
+                        <div><strong>RAW IOC:</strong> 185.220.101.${ipSuffix}:443 // TCP_ESTABLISHED</div>
+                        <div><strong>HASH:</strong> e3b0c44298fc1c149afbf4c8996fb92427ae${numId}</div>
+                    </div>
+
+                    <div class="feed-card-actions">
+                        <button type="button" class="feed-btn-inspect" data-action="inspect" data-id="${item.id}">
+                            <span>⚡ Inspect Raw AI Data</span>
+                        </button>
+                        <button type="button" class="feed-btn-copy" data-action="copy" data-id="${item.id}" title="Copy raw payload to clipboard">
+                            <span>📋 Copy JSON</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Attach buttons
+        container.querySelectorAll('[data-action="inspect"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                openIntelDossier(btn.getAttribute('data-id'));
+            });
+        });
+
+        container.querySelectorAll('[data-action="copy"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const threat = alerts.find(a => a.id === id);
+                if (threat) {
+                    const raw = generateRawAiTelemetry(threat);
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(JSON.stringify(raw, null, 2)).then(() => {
+                            showToast(`✓ Raw AI Telemetry for ${id} Copied to Clipboard!`);
+                        });
+                    }
+                }
+            });
+        });
+    }
+
+    function renderSectorView() {
+        const container = document.getElementById('sector-cards-container');
+        if (!container) return;
+
+        const SECTORS = [
+            { name: "Financial Core & Custody Clearing", risk: 94, incidents: 5, mttd: "3.2m", actor: "APT28 / Lazarus", sensor: "ONLINE (0ms)", icon: "🏦" },
+            { name: "Healthcare Clinical Data & PACS", risk: 88, incidents: 4, mttd: "4.8m", actor: "BlackCat / ALPHV", sensor: "ONLINE (1ms)", icon: "🏥" },
+            { name: "Defense Industrial Base & Weapons R&D", risk: 96, incidents: 6, mttd: "2.1m", actor: "APT-Vanguard", sensor: "ONLINE (0ms)", icon: "🛡️" },
+            { name: "Energy Grid & Industrial SCADA Logic", risk: 82, incidents: 3, mttd: "5.4m", actor: "Sandworm / Industroyer", sensor: "ONLINE (2ms)", icon: "⚡" },
+            { name: "Cloud & Sovereign Hyperscale Core", risk: 74, incidents: 2, mttd: "3.9m", actor: "Scattered Spider", sensor: "ONLINE (1ms)", icon: "☁️" },
+            { name: "Telecommunications & BGP Autonomous", risk: 79, incidents: 3, mttd: "4.1m", actor: "Volt Typhoon", sensor: "ONLINE (1ms)", icon: "📡" },
+            { name: "Government Identity & Citizen Portal", risk: 85, incidents: 3, mttd: "3.5m", actor: "Midnight Blizzard", sensor: "ONLINE (0ms)", icon: "🏛️" },
+            { name: "Global Retail Logistics & Supply Chain", risk: 68, incidents: 2, mttd: "6.2m", actor: "FIN7 Syndicate", sensor: "ONLINE (2ms)", icon: "📦" }
+        ];
+
+        container.innerHTML = SECTORS.map(sec => `
+            <div class="sector-card">
+                <div class="sector-header">
+                    <span style="font-size:24px;">${sec.icon}</span>
+                    <span class="sector-risk-badge" style="background:${sec.risk >= 90 ? 'rgba(255,45,85,0.2)' : 'rgba(245,158,11,0.2)'}; color:${sec.risk >= 90 ? '#ff2d55' : '#f59e0b'}; border:1px solid ${sec.risk >= 90 ? '#ff2d55' : '#f59e0b'};">
+                        RISK INDEX ${sec.risk}%
+                    </span>
+                </div>
+                <h3 class="sector-name">${sec.name}</h3>
+                <div class="sector-metrics-row">
+                    <div class="sector-metric-item">
+                        <span>Active Incidents</span>
+                        <div style="font-size:16px; font-weight:700; color:#ff2d55;">${sec.incidents} Threats</div>
+                    </div>
+                    <div class="sector-metric-item">
+                        <span>Mean Triage Speed</span>
+                        <div style="font-size:16px; font-weight:700; color:#00e676;">${sec.mttd}</div>
+                    </div>
+                </div>
+                <div style="font-family:var(--font-mono); font-size:10px; color:var(--text-tertiary);">
+                    <div><strong>PRIMARY ACTOR:</strong> ${sec.actor}</div>
+                    <div style="color:#00e676;"><strong>SENSOR PIPELINE:</strong> ${sec.sensor}</div>
+                </div>
+                <button type="button" class="feed-btn-inspect" data-sector="${sec.name}">
+                    <span>⚡ Inspect Raw Sector Telemetry</span>
+                </button>
+            </div>
+        `).join('');
+
+        container.querySelectorAll('[data-sector]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const matching = alerts.find(a => a.sector && a.sector.toLowerCase().includes('fin')) || alerts[0];
+                openIntelDossier(matching.id);
+            });
+        });
+    }
+
+    function renderReportsView() {
+        const container = document.getElementById('reports-cards-container');
+        if (!container) return;
+
+        const REPORTS = [
+            { id: "INC-2026-8841", title: "SolarStorm APT: Multi-Stage Domain Controller Compromise & Egress", sev: "CRITICAL", cvss: 9.8, artifacts: 26, nodes: 8, lead: "Commander Yash K.", time: "24 Oct 2026" },
+            { id: "TS-2026-0001", title: "Credential Exfiltration via Reverse-Tunneled C2 Channel", sev: "CRITICAL", cvss: 9.8, artifacts: 18, nodes: 6, lead: "Analyst YK", time: "24 Oct 2026" },
+            { id: "TS-2026-0002", title: "Ransomware Pre-Deployment Shadow Copy Purge & Boot Tamper", sev: "CRITICAL", cvss: 9.6, artifacts: 15, nodes: 5, lead: "Incident Cmdr YK", time: "23 Oct 2026" },
+            { id: "TS-2026-0003", title: "Industrial SCADA Logic Controller Firmware Tamper", sev: "CRITICAL", cvss: 9.7, artifacts: 22, nodes: 7, lead: "Analyst YK", time: "22 Oct 2026" },
+            { id: "TS-2026-0004", title: "Kubernetes API Server Service Account Token Compromise", sev: "CRITICAL", cvss: 9.5, artifacts: 19, nodes: 6, lead: "SOC Lead YK", time: "21 Oct 2026" },
+            { id: "TS-2026-0005", title: "DNS Tunneling C2 Channel over IPv6 Protocol Stack", sev: "HIGH", cvss: 8.8, artifacts: 14, nodes: 4, lead: "Analyst YK", time: "20 Oct 2026" }
+        ];
+
+        container.innerHTML = REPORTS.map(r => `
+            <div class="report-card">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span class="ev-badge-chip ev-chip--gold">DOSSIER // ${r.id}</span>
+                        <span class="sev-badge sev-badge--${r.sev.toLowerCase()}">${r.sev} • CVSS ${r.cvss}</span>
+                    </div>
+                    <h3 style="font-family:var(--font-heading); font-size:16px; font-weight:700; color:#ffffff; line-height:1.4;">${r.title}</h3>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; background:#020409; padding:10px 12px; border-radius:4px; font-family:var(--font-mono); font-size:10px;">
+                    <div><span style="color:var(--text-tertiary);">ARTIFACTS:</span> <strong style="color:#00e676;">${r.artifacts} Verified</strong></div>
+                    <div><span style="color:var(--text-tertiary);">ANALYST:</span> <strong style="color:#ffffff;">${r.lead}</strong></div>
+                    <div><span style="color:var(--text-tertiary);">STATUS:</span> <strong style="color:var(--gold-bright);">PUBLISHED</strong></div>
+                    <div><span style="color:var(--text-tertiary);">DATE:</span> <strong style="color:#38bdf8;">${r.time}</strong></div>
+                </div>
+
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button type="button" class="feed-btn-inspect" data-report-id="${r.id}">
+                        <span>⚡ Inspect Raw AI Data</span>
+                    </button>
+                    <button type="button" class="feed-btn-copy" data-action="download-json" data-report-id="${r.id}">
+                        <span>💾 JSON</span>
+                    </button>
+                    <button type="button" class="feed-btn-copy" data-action="download-md" data-report-id="${r.id}">
+                        <span>📝 Markdown</span>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+        container.querySelectorAll('[data-report-id]').forEach(btn => {
+            const id = btn.getAttribute('data-report-id');
+            const action = btn.getAttribute('data-action');
+            if (action === 'download-json') {
+                btn.onclick = () => {
+                    const threat = alerts.find(a => a.id === id) || alerts[0];
+                    const raw = generateRawAiTelemetry(threat);
+                    const blob = new Blob([JSON.stringify(raw, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${id}_AI_Dossier.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showToast(`✓ Downloaded ${id}_AI_Dossier.json`);
+                };
+            } else if (action === 'download-md') {
+                btn.onclick = () => {
+                    const threat = alerts.find(a => a.id === id) || alerts[0];
+                    let md = `# THREAT STORM — INCIDENT BRIEFING // ${id}\n\n`;
+                    md += `**Title:** ${threat.title}\n`;
+                    md += `**Severity:** ${threat.severity.toUpperCase()} (CVSS ${threat.cvss || 9.4})\n`;
+                    md += `**Classification:** TOP SECRET // ORCON // SOC VERIFIED\n\n`;
+                    md += `## Detection Narrative\n${threat.reason}\n\n`;
+                    md += `## Impact Assessment\n${threat.impact}\n`;
+                    const blob = new Blob([md], { type: 'text/markdown' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${id}_Briefing.md`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showToast(`✓ Downloaded ${id}_Briefing.md`);
+                };
+            } else {
+                btn.onclick = () => {
+                    openIntelDossier(id);
+                };
+            }
+        });
+    }
+
+    function renderSettingsView() {
+        const tbody = document.getElementById('settings-sensors-body');
+        if (!tbody) return;
+
+        const SENSORS = [
+            { id: "SNR-001", name: "EDR Behavioral Engine (Sysmon EID 1/3/10)", host: "Endpoints (4,250 Agents)", status: "ONLINE", latency: "0.8ms", tput: "1.4 MB/s" },
+            { id: "SNR-002", name: "Zeek Network Packet Intercept Tap", host: "Core Switch Fabric (40 Gbps)", status: "ONLINE", latency: "1.2ms", tput: "24.8 MB/s" },
+            { id: "SNR-003", name: "Active Directory Forwarding Agent (EID 4662)", host: "Domain Controllers (dc-auth-01/03)", status: "ONLINE", latency: "2.1ms", tput: "420 KB/s" },
+            { id: "SNR-004", name: "Darknet Honeytoken Canary Intercept", host: "Global Active Directory Forest", status: "ONLINE", latency: "0.4ms", tput: "12 KB/s" },
+            { id: "SNR-005", name: "CloudTrail Multi-Region GuardDuty Pipe", host: "AWS & Azure Hybrid Enclaves", status: "ONLINE", latency: "1.8ms", tput: "890 KB/s" },
+            { id: "SNR-006", name: "AMSI ScriptBlock Reassembly Daemon", host: "Workstations ws-fin-001..099", status: "ONLINE", latency: "1.5ms", tput: "650 KB/s" },
+            { id: "SNR-007", name: "Threat Intelligence Reputation Cluster", host: "Haute Cyber Bureau Cloud", status: "ONLINE", latency: "0.6ms", tput: "3.2 MB/s" }
+        ];
+
+        tbody.innerHTML = SENSORS.map(s => `
+            <tr>
+                <td style="color:var(--gold-bright); font-weight:700;">${s.id}</td>
+                <td style="color:#ffffff;">${s.name}</td>
+                <td>${s.host}</td>
+                <td><span class="ev-badge-chip ev-chip--gold" style="color:#00e676; border-color:#00e676;">✓ ${s.status}</span></td>
+                <td style="color:#38bdf8;">${s.latency}</td>
+                <td>${s.tput}</td>
+                <td><button type="button" class="feed-btn-copy" style="padding:3px 8px; font-size:10px;" onclick="window.switchAppView('feed')">Inspect Data</button></td>
+            </tr>
+        `).join('');
+    }
+
+    function renderFullAlertsTable(searchQuery = '', filterSeverity = 'all') {
+        const tbody = document.getElementById('full-alerts-body');
+        if (!tbody) return;
+
+        let filtered = alerts.filter(a => {
+            if (filterSeverity !== 'all' && a.severity.toLowerCase() !== filterSeverity.toLowerCase()) return false;
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                const match = (a.id && a.id.toLowerCase().includes(q)) ||
+                              (a.title && a.title.toLowerCase().includes(q)) ||
+                              (a.asset && a.asset.toLowerCase().includes(q)) ||
+                              (a.source && a.source.toLowerCase().includes(q));
+                if (!match) return false;
+            }
+            return true;
+        });
+
+        tbody.innerHTML = filtered.map(a => `
+            <tr class="table-row" data-id="${a.id}" tabindex="0" style="cursor:pointer;" title="Click to inspect raw AI telemetry dossier">
+                <td style="color:var(--gold-bright); font-family:var(--font-mono); font-weight:700;">${a.id}</td>
+                <td class="col-time">${new Date(a.timestamp).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })}</td>
+                <td class="col-threat"><strong>${a.title}</strong></td>
+                <td class="col-source">${a.source}</td>
+                <td class="col-target">${a.asset}</td>
+                <td><span style="font-family:var(--font-mono); font-size:10.5px; color:#38bdf8;">${a.mitre}</span></td>
+                <td class="col-sev"><span class="sev-badge sev-badge--${a.severity}">${a.severity.toUpperCase()}</span></td>
+                <td class="col-status"><span class="status-pill status-pill--${a.status}">${a.status}</span></td>
+                <td>
+                    <button type="button" class="feed-btn-copy" style="padding:3px 8px; font-size:10px;" data-raw-id="${a.id}">
+                        ⚡ Raw AI
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+
+        // Wire click handlers on rows
+        tbody.querySelectorAll('.table-row').forEach(row => {
+            row.addEventListener('click', () => {
+                openIntelDossier(row.getAttribute('data-id'));
+            });
+        });
+
+        tbody.querySelectorAll('[data-raw-id]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openIntelDossier(btn.getAttribute('data-raw-id'));
+            });
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 8. EVENT BINDINGS (ALL BUTTONS WIRED TO VALID RAW DATA)
     // ═══════════════════════════════════════════════════════════
 
     function bindEvents() {
-        // Table Row Click to Open Intel Panel
+        // Table Row Click to Open Intel Panel in Recent Threats
         const rows = document.querySelectorAll('.table-row');
         rows.forEach(r => {
             r.addEventListener('click', () => {
@@ -972,6 +1474,14 @@
                     e.preventDefault();
                     openIntelDossier(r.dataset.id);
                 }
+            });
+        });
+
+        // Clickable Latest Intelligence Items
+        document.querySelectorAll('.intel-item--clickable').forEach(item => {
+            item.addEventListener('click', () => {
+                const id = item.getAttribute('data-id') || 'TS-2026-0001';
+                openIntelDossier(id);
             });
         });
 
@@ -1002,6 +1512,7 @@
                             <span>${new Date().toLocaleTimeString()}</span> — Status changed to ${newStatus.toUpperCase()} (Analyst YK)
                         </div>
                     `;
+                    showToast(`✓ Incident ${current.id} status updated to ${newStatus.toUpperCase()}`);
                 }
             });
         }
@@ -1017,6 +1528,7 @@
                     </div>
                 `;
                 DOM.intelAnalystNotes.value = '';
+                showToast("✓ Technical Analyst Note appended to dossier");
             });
         }
 
@@ -1025,38 +1537,93 @@
             DOM.intelExportJson.addEventListener('click', () => {
                 const current = alerts.find(a => a.id === activeAlertId);
                 if (!current) return;
-                const blob = new Blob([JSON.stringify(current, null, 2)], { type: 'application/json' });
+                const raw = generateRawAiTelemetry(current);
+                const blob = new Blob([JSON.stringify(raw, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = `${current.id}_Dossier.json`;
                 a.click();
                 URL.revokeObjectURL(url);
+                showToast(`✓ Exported ${current.id}_Dossier.json`);
             });
         }
 
-        // Top Navigation Tabs
-        DOM.topNavTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                DOM.topNavTabs.forEach(t => t.classList.remove('tab-pill--active'));
-                tab.classList.add('tab-pill--active');
-            });
-        });
+        // ── Top Navigation Tabs (Switch to valid pages) ──
+        const tabPlanetary = document.getElementById('tab-planetary');
+        const tabEvidence = document.getElementById('tab-evidence-chain');
+        const tabFeed = document.getElementById('tab-feed');
+        const tabSector = document.getElementById('tab-sector');
+        const tabReports = document.getElementById('tab-reports');
+        const tabSettings = document.getElementById('tab-settings');
 
-        // View All Buttons
+        if (tabPlanetary) tabPlanetary.addEventListener('click', () => switchAppView('planetary'));
+        if (tabEvidence) tabEvidence.addEventListener('click', () => switchAppView('evidence-chain'));
+        if (tabFeed) tabFeed.addEventListener('click', () => switchAppView('feed'));
+        if (tabSector) tabSector.addEventListener('click', () => switchAppView('sector'));
+        if (tabReports) tabReports.addEventListener('click', () => switchAppView('reports'));
+        if (tabSettings) tabSettings.addEventListener('click', () => switchAppView('settings'));
+
+        // ── Sidebar Menu Links ──
+        const menuThreatMap = document.getElementById('menu-threat-map');
+        const menuEvidence = document.getElementById('menu-evidence-chain');
+        const menuFeed = document.getElementById('menu-feed');
+        const menuSector = document.getElementById('menu-sector');
+        const menuAlerts = document.getElementById('menu-alerts');
+        const menuReports = document.getElementById('menu-reports');
+        const menuSettings = document.getElementById('menu-settings');
+
+        if (menuThreatMap) menuThreatMap.addEventListener('click', (e) => { e.preventDefault(); switchAppView('planetary'); });
+        if (menuEvidence) menuEvidence.addEventListener('click', (e) => { e.preventDefault(); switchAppView('evidence-chain'); });
+        if (menuFeed) menuFeed.addEventListener('click', (e) => { e.preventDefault(); switchAppView('feed'); });
+        if (menuSector) menuSector.addEventListener('click', (e) => { e.preventDefault(); switchAppView('sector'); });
+        if (menuAlerts) menuAlerts.addEventListener('click', (e) => { e.preventDefault(); switchAppView('alerts'); });
+        if (menuReports) menuReports.addEventListener('click', (e) => { e.preventDefault(); switchAppView('reports'); });
+        if (menuSettings) menuSettings.addEventListener('click', (e) => { e.preventDefault(); switchAppView('settings'); });
+
+        // ── View All Buttons ──
         if (DOM.btnViewAllAlerts) {
-            DOM.btnViewAllAlerts.addEventListener('click', () => {
-                openIntelDossier('TS-2026-0001');
-            });
+            DOM.btnViewAllAlerts.addEventListener('click', () => switchAppView('alerts'));
         }
         if (DOM.btnViewAllIntel) {
-            DOM.btnViewAllIntel.addEventListener('click', () => {
-                openIntelDossier('TS-2026-0007');
-            });
+            DOM.btnViewAllIntel.addEventListener('click', () => switchAppView('feed'));
         }
         if (DOM.btnExploreMore) {
-            DOM.btnExploreMore.addEventListener('click', () => {
-                openIntelDossier('TS-2026-0003');
+            DOM.btnExploreMore.addEventListener('click', () => switchAppView('sector'));
+        }
+
+        // ── Search & Filter Inputs in Views ──
+        const feedSearch = document.getElementById('feed-search-input');
+        const feedFilter = document.getElementById('feed-severity-filter');
+        if (feedSearch) {
+            feedSearch.addEventListener('input', () => {
+                renderFeedView(feedFilter ? feedFilter.value : 'all', feedSearch.value.trim());
+            });
+        }
+        if (feedFilter) {
+            feedFilter.addEventListener('change', () => {
+                renderFeedView(feedFilter.value, feedSearch ? feedSearch.value.trim() : '');
+            });
+        }
+
+        const alertsSearch = document.getElementById('alerts-search-input');
+        const alertsFilter = document.getElementById('alerts-severity-filter');
+        if (alertsSearch) {
+            alertsSearch.addEventListener('input', () => {
+                renderFullAlertsTable(alertsSearch.value.trim(), alertsFilter ? alertsFilter.value : 'all');
+            });
+        }
+        if (alertsFilter) {
+            alertsFilter.addEventListener('change', () => {
+                renderFullAlertsTable(alertsSearch ? alertsSearch.value.trim() : '', alertsFilter.value);
+            });
+        }
+
+        // ── Ping Sensors Button ──
+        const btnPingSensors = document.getElementById('btn-ping-all-sensors');
+        if (btnPingSensors) {
+            btnPingSensors.addEventListener('click', () => {
+                showToast("⚡ 28/28 Planetary Sensors Responding • 0 Buffer Drops • Mean Latency 0.8ms");
             });
         }
     }

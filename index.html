@@ -899,7 +899,7 @@
                             </div>
 
                             <div class="intel-list">
-                                <div class="intel-item">
+                                <div class="intel-item intel-item--clickable" data-id="TS-2026-0007" title="Click to inspect raw AI telemetry & dossier">
                                     <div class="intel-item__icon icon--shield">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -907,11 +907,11 @@
                                     </div>
                                     <div class="intel-item__content">
                                         <span class="intel-title">APT28 Targets European Defense Contractors</span>
-                                        <span class="intel-time">2 hours ago</span>
+                                        <span class="intel-time">2 hours ago • Click for Raw AI Data</span>
                                     </div>
                                 </div>
 
-                                <div class="intel-item">
+                                <div class="intel-item intel-item--clickable" data-id="TS-2026-0002" title="Click to inspect raw AI telemetry & dossier">
                                     <div class="intel-item__icon icon--zap">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
@@ -919,11 +919,11 @@
                                     </div>
                                     <div class="intel-item__content">
                                         <span class="intel-title">New Ransomware Variant Detected (BlackLock)</span>
-                                        <span class="intel-time">4 hours ago</span>
+                                        <span class="intel-time">4 hours ago • Click for Raw AI Data</span>
                                     </div>
                                 </div>
 
-                                <div class="intel-item">
+                                <div class="intel-item intel-item--clickable" data-id="TS-2026-0004" title="Click to inspect raw AI telemetry & dossier">
                                     <div class="intel-item__icon icon--mail">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
@@ -931,11 +931,11 @@
                                     </div>
                                     <div class="intel-item__content">
                                         <span class="intel-title">Phishing Campaign Using Fake Microsoft Login</span>
-                                        <span class="intel-time">6 hours ago</span>
+                                        <span class="intel-time">6 hours ago • Click for Raw AI Data</span>
                                     </div>
                                 </div>
 
-                                <div class="intel-item">
+                                <div class="intel-item intel-item--clickable" data-id="TS-2026-0010" title="Click to inspect raw AI telemetry & dossier">
                                     <div class="intel-item__icon icon--lock">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -943,12 +943,178 @@
                                     </div>
                                     <div class="intel-item__content">
                                         <span class="intel-title">Supply Chain Attack on Open Source Libraries</span>
-                                        <span class="intel-time">8 hours ago</span>
+                                        <span class="intel-time">8 hours ago • Click for Raw AI Data</span>
                                     </div>
                                 </div>
                             </div>
+                <!-- ═══ 4. View: Intelligence Feed with Raw AI Threat Data ═══ -->
+                <section class="dashboard-view-section" id="view-feed" style="display: none;">
+                    <div class="view-header-card">
+                        <div class="view-header-left">
+                            <div class="view-badge-row">
+                                <span class="ev-badge-chip ev-chip--gold">AI THREAT FEED</span>
+                                <span class="ev-badge-chip ev-chip--crit">28 ACTIVE STREAMS</span>
+                                <span class="ev-badge-chip ev-chip--sample">CONFIDENCE: 94.8%</span>
+                            </div>
+                            <h2 class="view-title">
+                                <span>Global AI Threat Intelligence Feed</span>
+                            </h2>
+                            <p class="view-desc">
+                                Continuous real-time ingestion across 28 global enterprise vectors. Correlated AI heuristic detection, raw IOC cryptographic hashes, and deep sensor telemetry.
+                            </p>
                         </div>
+                        <div class="view-filter-bar">
+                            <input type="text" class="ev-search-input" id="feed-search-input" placeholder="Search by IoC, IP, CVE, or Threat..." style="width: 260px;">
+                            <select class="ev-select-filter" id="feed-severity-filter">
+                                <option value="all">All Severities</option>
+                                <option value="critical">Critical Severity</option>
+                                <option value="high">High Severity</option>
+                                <option value="medium">Medium Severity</option>
+                            </select>
+                        </div>
+                    </div>
 
+                    <!-- Dynamic Feed Cards Grid -->
+                    <div class="feed-cards-grid" id="feed-cards-container">
+                        <!-- Dynamically populated from threats.js -->
+                    </div>
+                </section>
+
+                <!-- ═══ 5. View: Sector Risk & Vulnerability Matrix ═══ -->
+                <section class="dashboard-view-section" id="view-sector" style="display: none;">
+                    <div class="view-header-card">
+                        <div class="view-header-left">
+                            <div class="view-badge-row">
+                                <span class="ev-badge-chip ev-chip--gold">SECTOR SURVEILLANCE</span>
+                                <span class="ev-badge-chip ev-chip--sample">28 ENTERPRISE VERTICALS</span>
+                            </div>
+                            <h2 class="view-title">
+                                <span>Global Sector Vulnerability Matrix</span>
+                            </h2>
+                            <p class="view-desc">
+                                Cross-sector threat density mapping. Monitor vulnerability scores, active incident blast radius, and raw AI sensor telemetry targeting critical infrastructure.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Sector Cards Grid -->
+                    <div class="sector-cards-grid" id="sector-cards-container">
+                        <!-- Dynamically populated -->
+                    </div>
+                </section>
+
+                <!-- ═══ 6. View: Executive Incident Reports & Dossier Vault ═══ -->
+                <section class="dashboard-view-section" id="view-reports" style="display: none;">
+                    <div class="view-header-card">
+                        <div class="view-header-left">
+                            <div class="view-badge-row">
+                                <span class="ev-badge-chip ev-chip--gold">INCIDENT VAULT</span>
+                                <span class="ev-badge-chip ev-chip--crit">CRITICAL DOSSIERS</span>
+                            </div>
+                            <h2 class="view-title">
+                                <span>Forensic Incident Reports &amp; AI Dossiers</span>
+                            </h2>
+                            <p class="view-desc">
+                                Formal technical briefings for enterprise incident response. Includes MITRE ATT&amp;CK mappings, verified evidence chains, and downloadable raw telemetry packages.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Reports Grid -->
+                    <div class="reports-cards-grid" id="reports-cards-container">
+                        <!-- Dynamically populated -->
+                    </div>
+                </section>
+
+                <!-- ═══ 7. View: Planetary Defense Grid Sensors & Settings ═══ -->
+                <section class="dashboard-view-section" id="view-settings" style="display: none;">
+                    <div class="view-header-card">
+                        <div class="view-header-left">
+                            <div class="view-badge-row">
+                                <span class="ev-badge-chip ev-chip--gold">DEFENSE GRID</span>
+                                <span class="ev-badge-chip ev-chip--sample">28 ACTIVE SENSORS</span>
+                                <span class="ev-badge-chip ev-chip--crit">0 BUFFER DROPS</span>
+                            </div>
+                            <h2 class="view-title">
+                                <span>Planetary Sensor Grid &amp; Pipeline Diagnostics</span>
+                            </h2>
+                            <p class="view-desc">
+                                Real-time telemetry ingestion health, kernel intercept pipeline latencies, and raw sensor diagnostics for global cyber surveillance.
+                            </p>
+                        </div>
+                        <div>
+                            <button type="button" class="ev-btn ev-btn--primary" id="btn-ping-all-sensors">
+                                <span>⚡ Ping All 28 Sensors</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Settings Sensor Grid Table -->
+                    <div class="card" style="padding: 18px; overflow-x: auto;">
+                        <table class="settings-sensors-table" id="settings-sensors-table">
+                            <thead>
+                                <tr>
+                                    <th>Sensor ID</th>
+                                    <th>Telemetry Pipeline</th>
+                                    <th>Target Host / Segment</th>
+                                    <th>Status</th>
+                                    <th>Latency</th>
+                                    <th>Throughput</th>
+                                    <th>Raw AI Verification</th>
+                                </tr>
+                            </thead>
+                            <tbody id="settings-sensors-body">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ═══ 8. View: Complete Alerts Telemetry Bureau ═══ -->
+                <section class="dashboard-view-section" id="view-alerts" style="display: none;">
+                    <div class="view-header-card">
+                        <div class="view-header-left">
+                            <div class="view-badge-row">
+                                <span class="ev-badge-chip ev-chip--gold">TELEMETRY BUREAU</span>
+                                <span class="ev-badge-chip ev-chip--crit">28 INCIDENTS</span>
+                            </div>
+                            <h2 class="view-title">
+                                <span>Comprehensive Threat Alerts Bureau</span>
+                            </h2>
+                            <p class="view-desc">
+                                Full database of active and historic security incidents. Click any row to inspect complete raw AI telemetry, sensor artifacts, and blast radius.
+                            </p>
+                        </div>
+                        <div class="view-filter-bar">
+                            <input type="text" class="ev-search-input" id="alerts-search-input" placeholder="Filter alerts by name, asset, source..." style="width: 260px;">
+                            <select class="ev-select-filter" id="alerts-severity-filter">
+                                <option value="all">All Severities</option>
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="card" style="padding: 18px; overflow-x: auto;">
+                        <table class="threats-table" id="full-alerts-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Timestamp</th>
+                                    <th>Threat</th>
+                                    <th>Source</th>
+                                    <th>Asset</th>
+                                    <th>MITRE</th>
+                                    <th>Severity</th>
+                                    <th>Status</th>
+                                    <th>Raw Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="full-alerts-body">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
                     </div>
                 </section>
 
@@ -1053,6 +1219,17 @@
                     <div class="intel-section__content" id="intel-investigation-content"></div>
                 </div>
 
+                <!-- Raw AI Telemetry & SIEM Sensor Payload -->
+                <div class="intel-section" id="intel-raw-section">
+                    <div class="intel-section__header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="intel-section__title">Raw AI Telemetry &amp; SIEM Sensor Payload</h3>
+                        <button type="button" class="intel-actions__btn intel-actions__btn--ghost" id="intel-btn-copy-raw" style="padding: 4px 10px; font-size: 11px;">
+                            <span>📋 Copy Raw AI Data</span>
+                        </button>
+                    </div>
+                    <div class="intel-section__content" id="intel-raw-content"></div>
+                </div>
+
                 <!-- Analyst Command Station -->
                 <div class="intel-actions" id="intel-actions">
                     <h3 class="intel-actions__title">Analyst Decision Station</h3>
@@ -1106,6 +1283,12 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- Floating Haute Toast Notification HUD -->
+    <div class="toast-hud" id="toast-hud" role="alert" aria-live="assertive">
+        <span class="toast-icon">⚡</span>
+        <span class="toast-msg" id="toast-msg">Raw AI Telemetry Copied</span>
     </div>
 
     <script src="threats.js"></script>
