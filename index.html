@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="THREAT STORM — Cyber Intelligence Bureau. Real-time threat visibility and planetary surveillance.">
+    <meta name="theme-color" content="#060810">
+    <title>THREAT STORM — Cyber Intelligence Bureau</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body class="dashboard-body">
+
+    <!-- ═══ Background Atmosphere ═══ -->
+    <div class="bg-atmosphere" aria-hidden="true">
+        <div class="bg-atmosphere__radial-top"></div>
+        <div class="bg-atmosphere__radial-center"></div>
+        <div class="bg-atmosphere__grid"></div>
+    </div>
+
+    <!-- ═══ App Container Layout ═══ -->
+    <div class="app-layout">
+
+        <!-- ═══ Left Sidebar Navigation ═══ -->
+        <aside class="sidebar" id="app-sidebar">
+            <div class="sidebar__header">
+                <a href="#" class="sidebar__brand">
+                    <div class="brand-shield" aria-hidden="true">
+                        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                            <polygon points="16,2 29,8 29,20 16,30 3,20 3,8" stroke="#d4af37" stroke-width="1.8" fill="rgba(212,175,55,0.08)"/>
+                            <polygon points="16,6 25,10 25,18 16,25 7,18 7,10" stroke="#00e676" stroke-width="1.2" fill="none"/>
+                            <circle cx="16" cy="15" r="3" fill="#d4af37" filter="drop-shadow(0 0 6px #d4af37)"/>
+                        </svg>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-title">THREAT STORM</span>
+                        <span class="brand-sub">CYBER INTELLIGENCE BUREAU</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="sidebar__nav">
+                <a href="#hero-section" class="nav-item nav-item--active" id="menu-home">
+                    <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    <span>Home</span>
+                </a>
+                <a href="#global-threat-map-card" class="nav-item" id="menu-threat-map">
+                    <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span>Threat Map</span>
+                </a>
+                <a href="#recent-threats-section" class="nav-item" id="menu-feed">
+                    <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
+                    </svg>
+                    <span>Intelligence Feed</span>
+                </a>
+                <a href="#stats-grid" class="nav-item" id="menu-sector">
+                    <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    <span>Sector Matrix</span>
+                </a>
+                <a href="#recent-threats-section" class="nav-item" id="menu-alerts">
+                    <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                    <span>Alerts</span>
+                    <span class="nav-badge-count">28</span>
+                </a>
+                <a href="#latest-intel-card" class="nav-item" id="menu-reports">
+                    <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    <span>Reports</span>
+                </a>
+                <a href="#site-footer" class="nav-item" id="menu-settings">
+                    <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <!-- Bottom Wave Widget -->
+            <div class="sidebar__wave-card">
+                <div class="sidebar__wave-img" style="background-image: url('wave.jpg');"></div>
+                <div class="sidebar__wave-overlay"></div>
+                <div class="sidebar__wave-text">
+                    <span class="wave-highlight">Smarter Detection.</span>
+                    <span class="wave-sub">Safer Tomorrow.</span>
+                </div>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar__footer">
+                <div class="sidebar__footer-shield">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <div class="sidebar__footer-info">
+                    <span class="footer-name">THREAT STORM</span>
+                    <span class="footer-ver">v2.5.0</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ═══ Main Content Viewport ═══ -->
+        <div class="main-viewport">
+
+            <!-- ═══ Top Header Navigation Bar ═══ -->
+            <header class="top-nav">
+                <!-- Center Navigation Tabs -->
+                <nav class="top-nav__tabs">
+                    <button type="button" class="tab-pill tab-pill--active" id="tab-planetary">Planetary Threat Map</button>
+                    <button type="button" class="tab-pill" id="tab-feed">Intelligence Feed</button>
+                    <button type="button" class="tab-pill" id="tab-sector">Sector Matrix</button>
+                    <button type="button" class="tab-pill" id="tab-reports">Reports</button>
+                    <button type="button" class="tab-pill" id="tab-settings">Settings</button>
+                </nav>
+
+                <!-- Right Utility Icons -->
+                <div class="top-nav__actions">
+                    <button type="button" class="action-btn" id="btn-search-toggle" aria-label="Search threat database">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="action-btn action-btn--has-badge" id="btn-notifications" aria-label="Notifications">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        <span class="notification-dot"></span>
+                    </button>
+                    <div class="user-avatar" title="Commander Yash K.">
+                        <span>YK</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ═══ Scrollable Dashboard Content ═══ -->
+            <main class="dashboard-content" id="main-content">
+
+                <!-- ═══ 1. Hero Section: Editorial Headline & 3D Rotating Earth Globe ═══ -->
+                <section class="hero-section" id="hero-section">
+                    <div class="hero-grid">
+
+                        <!-- Left Column: Editorial Headline & Feature Tags -->
+                        <div class="hero-left">
+                            <div class="hero-eyebrow">
+                                <span class="eyebrow-text">GLOBAL CYBER THREAT INTELLIGENCE</span>
+                                <span class="eyebrow-dot">•</span>
+                            </div>
+                            <h1 class="hero-title">
+                                <span class="hero-title__lead">Real-Time Threat</span>
+                                <span class="hero-title__impact">
+                                    <span class="title-light">Visibility. </span><span class="title-gold">Global Impact.</span>
+                                </span>
+                            </h1>
+                            <p class="hero-description">
+                                Advanced surveillance and intelligence correlation across 28 global enterprise sectors. Real-time telemetry, verified technical evidence, and analyst decision gates delivered with razor precision.
+                            </p>
+
+                            <!-- 4 Feature Badges -->
+                            <div class="hero-features">
+                                <div class="feature-badge">
+                                    <span class="feature-icon">🧠</span>
+                                    <span>AI-Powered Analytics</span>
+                                </div>
+                                <div class="feature-badge">
+                                    <span class="feature-icon">🔗</span>
+                                    <span>Real-Time Correlation</span>
+                                </div>
+                                <div class="feature-badge">
+                                    <span class="feature-icon">🛡️</span>
+                                    <span>Verified Evidence</span>
+                                </div>
+                                <div class="feature-badge">
+                                    <span class="feature-icon">🌐</span>
+                                    <span>Global Coverage</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: 3D Planetary Earth Globe & Severity Legend -->
+                        <div class="hero-right">
+                            <!-- Live Telemetry Clock Header -->
+                            <div class="live-clock-bar">
+                                <span class="live-indicator-dot"></span>
+                                <span class="live-clock-text" id="live-utc-clock">Live Intelligence • 28 Nov 2026 • 14:32:17 (UTC)</span>
+                            </div>
+
+                            <!-- Interactive 3D Earth Globe Canvas Container -->
+                            <div class="globe-viewport-container" id="globe-container">
+                                <canvas id="earth-globe-canvas" width="460" height="380" aria-label="3D Planetary Threat Globe"></canvas>
+
+                                <!-- Floating Threat Callout Badge Attached to Globe -->
+                                <div class="globe-callout" id="globe-callout-badge">
+                                    <span class="callout-icon">🎯</span>
+                                    <div class="callout-details">
+                                        <span class="callout-title">Ransomware Campaign</span>
+                                        <span class="callout-sub">Multiple Targets • 12:42 UTC</span>
+                                    </div>
+                                </div>
+
+                                <!-- Severity Legend Column -->
+                                <div class="globe-legend">
+                                    <div class="legend-row">
+                                        <span class="legend-dot dot--critical"></span>
+                                        <span class="legend-label">Critical</span>
+                                        <span class="legend-value" id="globe-val-crit">07</span>
+                                    </div>
+                                    <div class="legend-row">
+                                        <span class="legend-dot dot--high"></span>
+                                        <span class="legend-label">High</span>
+                                        <span class="legend-value" id="globe-val-high">21</span>
+                                    </div>
+                                    <div class="legend-row">
+                                        <span class="legend-dot dot--medium"></span>
+                                        <span class="legend-label">Medium</span>
+                                        <span class="legend-value" id="globe-val-med">34</span>
+                                    </div>
+                                    <div class="legend-row">
+                                        <span class="legend-dot dot--low"></span>
+                                        <span class="legend-label">Low</span>
+                                        <span class="legend-value" id="globe-val-low">18</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ═══ 2. Middle Section: Global Threat Map & 4 Metric Cards + Distribution ═══ -->
+                <section class="middle-section" id="middle-dashboard">
+                    <div class="middle-grid">
+
+                        <!-- Left Large Card: Authentic 2D World Threat Map -->
+                        <div class="card global-threat-map-card" id="global-threat-map-card">
+                            <div class="card-header">
+                                <div class="card-header__left">
+                                    <div class="header-icon-box">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2">
+                                            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                                            <polyline points="2 17 12 22 22 17"/>
+                                            <polyline points="2 12 12 17 22 12"/>
+                                        </svg>
+                                    </div>
+                                    <h2 class="card-title">GLOBAL THREAT MAP</h2>
+                                </div>
+                                <div class="card-header__right">
+                                    <select class="time-dropdown" id="map-time-range" aria-label="Select Map Time Range">
+                                        <option value="24h" selected>Last 24 Hours</option>
+                                        <option value="12h">Last 12 Hours</option>
+                                        <option value="7d">Last 7 Days</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Map Canvas Container (Touch/Click to Launch Intercept Flights!) -->
+                            <div class="map-interactive-wrapper" id="world-map-wrapper">
+                                <!-- Authentic Real High-Resolution Cyber World Map -->
+                                <div class="real-world-map-bg" style="background-image: url('world_map.jpg');" aria-hidden="true"></div>
+                                <div class="real-world-map-grid-overlay" aria-hidden="true"></div>
+
+                                <!-- Live Telemetry Flight Canvas (Draws Moving Packets, Arcs, and Expanding Sonar Ripples) -->
+                                <canvas id="world-telemetry-canvas" class="world-telemetry-canvas" width="1000" height="420" aria-label="Interactive Threat Vectors"></canvas>
+
+                                <!-- Callout Badges on the Map (Exact match to Reference Image) -->
+                                <div class="map-target-badge map-target-badge--na" id="badge-na">
+                                    <span class="badge-dot badge-dot--coral"></span>
+                                    <div class="badge-text">
+                                        <span class="badge-title">Phishing Campaign</span>
+                                        <span class="badge-sub">2.8K Targets</span>
+                                    </div>
+                                </div>
+
+                                <div class="map-target-badge map-target-badge--sa" id="badge-sa">
+                                    <span class="badge-dot badge-dot--gold"></span>
+                                    <div class="badge-text">
+                                        <span class="badge-title">Malware Distribution</span>
+                                        <span class="badge-sub">1.4K Targets</span>
+                                    </div>
+                                </div>
+
+                                <div class="map-target-badge map-target-badge--asia" id="badge-asia">
+                                    <span class="badge-dot badge-dot--red"></span>
+                                    <div class="badge-text">
+                                        <span class="badge-title">DDoS Attack</span>
+                                        <span class="badge-sub">3.2K Targets</span>
+                                    </div>
+                                </div>
+
+                                <div class="map-target-badge map-target-badge--aus" id="badge-aus">
+                                    <span class="badge-dot badge-dot--gold"></span>
+                                    <div class="badge-text">
+                                        <span class="badge-title">Credential Theft</span>
+                                        <span class="badge-sub">1.1K Targets</span>
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Touch Hint at bottom of map -->
+                                <div class="map-hint-banner" id="map-touch-hint">
+                                    <span>TOUCH / CLICK MAP TO LAUNCH INTERCEPT TELEMETRY PACKETS</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: 4 HUD Stat Metric Cards + Bottom Analytics Grid -->
+                        <div class="middle-right-col" id="stats-grid">
+                            <!-- 2x2 Metric Cards Grid -->
+                            <div class="metric-cards-grid">
+
+                                <!-- 1. ACTIVE INCIDENTS -->
+                                <div class="card metric-card-hud metric-card-hud--crit">
+                                    <div class="hud-card-top">
+                                        <div class="hud-dial hud-dial--crit">
+                                            <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+                                                <circle cx="24" cy="24" r="22" stroke="rgba(255, 45, 85, 0.25)" stroke-width="1.2" stroke-dasharray="3 3"/>
+                                                <circle cx="24" cy="24" r="17" stroke="rgba(255, 45, 85, 0.45)" stroke-width="2"/>
+                                                <circle cx="24" cy="24" r="11" stroke="#ff2d55" stroke-width="2" fill="rgba(255, 45, 85, 0.15)"/>
+                                                <circle cx="24" cy="24" r="4.5" fill="#ff2d55" filter="drop-shadow(0 0 6px #ff2d55)"/>
+                                                <line x1="24" y1="2" x2="24" y2="7" stroke="#ff2d55" stroke-width="2"/>
+                                                <line x1="24" y1="41" x2="24" y2="46" stroke="#ff2d55" stroke-width="2"/>
+                                                <line x1="2" y1="24" x2="7" y2="24" stroke="#ff2d55" stroke-width="2"/>
+                                                <line x1="41" y1="24" x2="46" y2="24" stroke="#ff2d55" stroke-width="2"/>
+                                            </svg>
+                                        </div>
+                                        <div class="hud-title-group">
+                                            <span class="hud-metric-label">ACTIVE INCIDENTS</span>
+                                            <span class="hud-metric-value">12</span>
+                                        </div>
+                                        <div class="hud-trend-pill hud-trend-pill--crit">
+                                            <span class="trend-arrow">↑</span>
+                                            <span>53%</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status Strip Banner -->
+                                    <div class="hud-banner hud-banner--crit">
+                                        <span class="banner-icon-tri">▲</span>
+                                        <span class="banner-text">CRITICAL THRESHOLD • 68% RISK DENSITY</span>
+                                    </div>
+
+                                    <!-- Luminous Neon Sine Wave Sparkline Canvas -->
+                                    <div class="hud-sparkline-box">
+                                        <canvas id="sparkline-active" width="280" height="52"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- 2. BLOCKED INTRUSIONS -->
+                                <div class="card metric-card-hud metric-card-hud--emerald">
+                                    <div class="hud-card-top">
+                                        <div class="hud-dial hud-dial--emerald">
+                                            <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+                                                <circle cx="24" cy="24" r="22" stroke="rgba(0, 230, 118, 0.25)" stroke-width="1.2" stroke-dasharray="3 3"/>
+                                                <circle cx="24" cy="24" r="17" stroke="rgba(0, 230, 118, 0.45)" stroke-width="2"/>
+                                                <path d="M24 11L33 15V22C33 28 29 32.5 24 34.5C19 32.5 15 28 15 22V15L24 11Z" stroke="#00e676" stroke-width="2" fill="rgba(0, 230, 118, 0.15)" filter="drop-shadow(0 0 6px #00e676)"/>
+                                                <path d="M24 17L29 19.5V23.5C29 27 26.5 29.5 24 30.5C21.5 29.5 19 27 19 23.5V19.5L24 17Z" fill="#00e676"/>
+                                            </svg>
+                                        </div>
+                                        <div class="hud-title-group">
+                                            <span class="hud-metric-label">BLOCKED INTRUSIONS</span>
+                                            <span class="hud-metric-value">245</span>
+                                        </div>
+                                        <div class="hud-trend-pill hud-trend-pill--emerald">
+                                            <span class="trend-icon-mini">🛡</span>
+                                            <span class="trend-arrow">↑</span>
+                                            <span>18%</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status Strip Banner with Segmented Slash Bars -->
+                                    <div class="hud-banner hud-banner--emerald">
+                                        <span class="banner-text">FIREWALL PERIMETER • 92% EFFICIENCY RATE</span>
+                                        <div class="slash-bars-track">
+                                            <span class="slash-bar slash--emerald filled"></span>
+                                            <span class="slash-bar slash--emerald filled"></span>
+                                            <span class="slash-bar slash--emerald filled"></span>
+                                            <span class="slash-bar slash--emerald filled"></span>
+                                            <span class="slash-bar slash--emerald filled"></span>
+                                            <span class="slash-bar slash--emerald filled"></span>
+                                            <span class="slash-bar slash--emerald filled"></span>
+                                            <span class="slash-bar slash--emerald filled"></span>
+                                            <span class="slash-bar slash--emerald filled"></span>
+                                            <span class="slash-bar slash--emerald empty"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Luminous Neon Sine Wave Sparkline Canvas -->
+                                    <div class="hud-sparkline-box">
+                                        <canvas id="sparkline-blocked" width="280" height="52"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- 3. HIGH RISK VULNERABILITIES -->
+                                <div class="card metric-card-hud metric-card-hud--amber">
+                                    <div class="hud-card-top">
+                                        <div class="hud-dial hud-dial--amber">
+                                            <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+                                                <circle cx="24" cy="24" r="22" stroke="rgba(245, 158, 11, 0.25)" stroke-width="1.2" stroke-dasharray="3 3"/>
+                                                <circle cx="24" cy="24" r="17" stroke="rgba(245, 158, 11, 0.45)" stroke-width="2"/>
+                                                <path d="M24 13L34 31H14L24 13Z" stroke="#f59e0b" stroke-width="2" fill="rgba(245, 158, 11, 0.15)" filter="drop-shadow(0 0 6px #f59e0b)"/>
+                                                <line x1="24" y1="19" x2="24" y2="24" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+                                                <circle cx="24" cy="27.5" r="1.3" fill="#ffffff"/>
+                                            </svg>
+                                        </div>
+                                        <div class="hud-title-group">
+                                            <span class="hud-metric-label">HIGH RISK VULNERABILITIES</span>
+                                            <span class="hud-metric-value">37</span>
+                                        </div>
+                                        <div class="hud-trend-pill hud-trend-pill--amber">
+                                            <span class="trend-icon-mini">▲</span>
+                                            <span class="trend-arrow">↑</span>
+                                            <span>12%</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status Strip Banner with Segmented Slash Bars -->
+                                    <div class="hud-banner hud-banner--amber">
+                                        <span class="banner-text">MITIGATION PIPELINE • 44% PATCHED</span>
+                                        <div class="slash-bars-track">
+                                            <span class="slash-bar slash--amber filled"></span>
+                                            <span class="slash-bar slash--amber filled"></span>
+                                            <span class="slash-bar slash--amber filled"></span>
+                                            <span class="slash-bar slash--amber filled"></span>
+                                            <span class="slash-bar slash--amber empty"></span>
+                                            <span class="slash-bar slash--amber empty"></span>
+                                            <span class="slash-bar slash--amber empty"></span>
+                                            <span class="slash-bar slash--amber empty"></span>
+                                            <span class="slash-bar slash--amber empty"></span>
+                                            <span class="slash-bar slash--amber empty"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Luminous Neon Sine Wave Sparkline Canvas -->
+                                    <div class="hud-sparkline-box">
+                                        <canvas id="sparkline-vuln" width="280" height="52"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- 4. MTTD -->
+                                <div class="card metric-card-hud metric-card-hud--blue">
+                                    <div class="hud-card-top">
+                                        <div class="hud-dial hud-dial--blue">
+                                            <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+                                                <circle cx="24" cy="24" r="22" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.2" stroke-dasharray="3 3"/>
+                                                <circle cx="24" cy="24" r="17" stroke="rgba(56, 189, 248, 0.45)" stroke-width="2"/>
+                                                <circle cx="24" cy="24" r="11" stroke="#38bdf8" stroke-width="2" fill="rgba(56, 189, 248, 0.15)"/>
+                                                <polyline points="24 17 24 24 28 26.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" filter="drop-shadow(0 0 6px #38bdf8)"/>
+                                            </svg>
+                                        </div>
+                                        <div class="hud-title-group">
+                                            <span class="hud-metric-label">MTTD</span>
+                                            <span class="hud-metric-value">4.6 <span class="hud-unit">hrs</span></span>
+                                        </div>
+                                        <div class="hud-trend-pill hud-trend-pill--blue">
+                                            <span class="trend-arrow">↓</span>
+                                            <span>21%</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status Strip Banner with Segmented Slash Bars -->
+                                    <div class="hud-banner hud-banner--blue">
+                                        <span class="banner-text">SPEED FACTOR • 82% ACCELERATED</span>
+                                        <div class="slash-bars-track">
+                                            <span class="slash-bar slash--blue filled"></span>
+                                            <span class="slash-bar slash--blue filled"></span>
+                                            <span class="slash-bar slash--blue filled"></span>
+                                            <span class="slash-bar slash--blue filled"></span>
+                                            <span class="slash-bar slash--blue filled"></span>
+                                            <span class="slash-bar slash--blue filled"></span>
+                                            <span class="slash-bar slash--blue filled"></span>
+                                            <span class="slash-bar slash--blue filled"></span>
+                                            <span class="slash-bar slash--blue empty"></span>
+                                            <span class="slash-bar slash--blue empty"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Luminous Neon Sine Wave Sparkline Canvas -->
+                                    <div class="hud-sparkline-box">
+                                        <canvas id="sparkline-mttd" width="280" height="52"></canvas>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Bottom 2 Analytics Cards: Threat Distribution & Targeted Customers / Audiences -->
+                            <div class="analytics-sub-grid">
+
+                                <!-- Threat Distribution Donut -->
+                                <div class="card analytics-hud-card">
+                                    <div class="analytics-hud-header">
+                                        <svg class="hud-header-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <circle cx="12" cy="12" r="4"/>
+                                            <line x1="12" y1="2" x2="12" y2="4"/>
+                                            <line x1="12" y1="20" x2="12" y2="22"/>
+                                            <line x1="2" y1="12" x2="4" y2="12"/>
+                                            <line x1="20" y1="12" x2="22" y2="12"/>
+                                        </svg>
+                                        <h3 class="analytics-hud-title">Threat Distribution</h3>
+                                    </div>
+                                    <div class="donut-container-hud">
+                                        <div class="donut-canvas-box-hud">
+                                            <canvas id="threat-donut-canvas" width="130" height="130"></canvas>
+                                            <div class="donut-center-label-hud">
+                                                <span class="donut-sub-hud">TOTAL</span>
+                                                <span class="donut-total-hud">1.2K</span>
+                                            </div>
+                                        </div>
+                                        <div class="donut-legend-hud">
+                                            <div class="donut-legend-row-hud"><span class="legend-dot-hud dot--red"></span><span class="legend-label-hud">Malware</span><span class="legend-val-hud">32%</span></div>
+                                            <div class="donut-legend-row-hud"><span class="legend-dot-hud dot--orange"></span><span class="legend-label-hud">Phishing</span><span class="legend-val-hud">24%</span></div>
+                                            <div class="donut-legend-row-hud"><span class="legend-dot-hud dot--yellow"></span><span class="legend-label-hud">DDoS</span><span class="legend-val-hud">15%</span></div>
+                                            <div class="donut-legend-row-hud"><span class="legend-dot-hud dot--cyan"></span><span class="legend-label-hud">Ransomware</span><span class="legend-val-hud">14%</span></div>
+                                            <div class="donut-legend-row-hud"><span class="legend-dot-hud dot--purple"></span><span class="legend-label-hud">Others</span><span class="legend-val-hud">12%</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Targeted Customers / Audiences -->
+                                <div class="card analytics-hud-card">
+                                    <div class="analytics-hud-header">
+                                        <svg class="hud-header-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                            <circle cx="9" cy="7" r="4"/>
+                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                        </svg>
+                                        <h3 class="analytics-hud-title">Targeted Customers / Audiences</h3>
+                                    </div>
+                                    <div class="audience-list-hud">
+                                        <div class="audience-row-hud">
+                                            <span class="aud-icon">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M9 10v11M15 10v11M19 10v11M12 2l10 7H2l10-7z"/></svg>
+                                            </span>
+                                            <span class="aud-name">Finance</span>
+                                            <div class="aud-bar-track">
+                                                <div class="aud-bar-fill aud-bar--cyan" style="width: 33%;"></div>
+                                            </div>
+                                            <span class="aud-pct">33%</span>
+                                        </div>
+                                        <div class="audience-row-hud">
+                                            <span class="aud-icon">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            </span>
+                                            <span class="aud-name">Healthcare</span>
+                                            <div class="aud-bar-track">
+                                                <div class="aud-bar-fill aud-bar--teal" style="width: 21%;"></div>
+                                            </div>
+                                            <span class="aud-pct">21%</span>
+                                        </div>
+                                        <div class="audience-row-hud">
+                                            <span class="aud-icon">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                            </span>
+                                            <span class="aud-name">Technology</span>
+                                            <div class="aud-bar-track">
+                                                <div class="aud-bar-fill aud-bar--blue" style="width: 16%;"></div>
+                                            </div>
+                                            <span class="aud-pct">16%</span>
+                                        </div>
+                                        <div class="audience-row-hud">
+                                            <span class="aud-icon">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M12 2L2 7h20L12 2z"/><line x1="4" y1="7" x2="4" y2="19"/><line x1="20" y1="7" x2="20" y2="19"/><line x1="9" y1="7" x2="9" y2="19"/><line x1="15" y1="7" x2="15" y2="19"/><line x1="2" y1="19" x2="22" y2="19"/></svg>
+                                            </span>
+                                            <span class="aud-name">Government</span>
+                                            <div class="aud-bar-track">
+                                                <div class="aud-bar-fill aud-bar--amber" style="width: 12%;"></div>
+                                            </div>
+                                            <span class="aud-pct">12%</span>
+                                        </div>
+                                        <div class="audience-row-hud">
+                                            <span class="aud-icon">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+                                            </span>
+                                            <span class="aud-name">Others</span>
+                                            <div class="aud-bar-track">
+                                                <div class="aud-bar-fill aud-bar--purple" style="width: 17%;"></div>
+                                            </div>
+                                            <span class="aud-pct">17%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ═══ 3. Bottom Row: Recent Threat Alerts Table + Latest Intelligence + Cinematic Mountain Card ═══ -->
+                <section class="bottom-section" id="recent-threats-section">
+                    <div class="bottom-grid">
+
+                        <!-- Left: Recent Threat Alerts Table Card -->
+                        <div class="card recent-threats-card">
+                            <div class="card-header">
+                                <div class="card-header__left">
+                                    <div class="header-icon-box">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2">
+                                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                        </svg>
+                                    </div>
+                                    <h2 class="card-title">Recent Threat Alerts</h2>
+                                </div>
+                                <div class="card-header__right">
+                                    <button type="button" class="view-all-link" id="btn-view-all-alerts">View All →</button>
+                                </div>
+                            </div>
+
+                            <!-- High Density Table -->
+                            <div class="threats-table-wrapper">
+                                <table class="threats-table" id="alerts-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Threat</th>
+                                            <th>Source</th>
+                                            <th>Target</th>
+                                            <th>Severity</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="alerts-table-body">
+                                        <!-- Row 1: Ransomware Detected -->
+                                        <tr class="table-row" data-id="TS-2026-0002" tabindex="0" title="Click to view full intelligence dossier">
+                                            <td class="col-time"><span class="dot-indicator dot--critical"></span>14:21</td>
+                                            <td class="col-threat"><strong>Ransomware Detected</strong></td>
+                                            <td class="col-source">US-East</td>
+                                            <td class="col-target">Enterprise Cluster</td>
+                                            <td class="col-sev"><span class="sev-badge sev-badge--critical">Critical</span></td>
+                                            <td class="col-status"><span class="status-pill status-pill--investigating">Investigating</span></td>
+                                        </tr>
+                                        <!-- Row 2: Suspicious Login Attempt -->
+                                        <tr class="table-row" data-id="TS-2026-0008" tabindex="0" title="Click to view full intelligence dossier">
+                                            <td class="col-time"><span class="dot-indicator dot--high"></span>13:56</td>
+                                            <td class="col-threat"><strong>Suspicious Login Attempt</strong></td>
+                                            <td class="col-source">Europe</td>
+                                            <td class="col-target">Finance Sector</td>
+                                            <td class="col-sev"><span class="sev-badge sev-badge--high">High</span></td>
+                                            <td class="col-status"><span class="status-pill status-pill--blocked">Blocked</span></td>
+                                        </tr>
+                                        <!-- Row 3: Malicious File Upload -->
+                                        <tr class="table-row" data-id="TS-2026-0009" tabindex="0" title="Click to view full intelligence dossier">
+                                            <td class="col-time"><span class="dot-indicator dot--high"></span>12:43</td>
+                                            <td class="col-threat"><strong>Malicious File Upload</strong></td>
+                                            <td class="col-source">APAC</td>
+                                            <td class="col-target">Healthcare</td>
+                                            <td class="col-sev"><span class="sev-badge sev-badge--high">High</span></td>
+                                            <td class="col-status"><span class="status-pill status-pill--contained">Contained</span></td>
+                                        </tr>
+                                        <!-- Row 4: DDoS Attack -->
+                                        <tr class="table-row" data-id="TS-2026-0018" tabindex="0" title="Click to view full intelligence dossier">
+                                            <td class="col-time"><span class="dot-indicator dot--medium"></span>11:17</td>
+                                            <td class="col-threat"><strong>DDoS Attack</strong></td>
+                                            <td class="col-source">Global</td>
+                                            <td class="col-target">Web Services</td>
+                                            <td class="col-sev"><span class="sev-badge sev-badge--medium">Medium</span></td>
+                                            <td class="col-status"><span class="status-pill status-pill--monitoring">Monitoring</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Center: Latest Intelligence List Card -->
+                        <div class="card latest-intel-card" id="latest-intel-card">
+                            <div class="card-header">
+                                <div class="card-header__left">
+                                    <div class="header-icon-box">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                                        </svg>
+                                    </div>
+                                    <h2 class="card-title">Latest Intelligence</h2>
+                                </div>
+                                <div class="card-header__right">
+                                    <button type="button" class="view-all-link" id="btn-view-all-intel">View All →</button>
+                                </div>
+                            </div>
+
+                            <div class="intel-list">
+                                <div class="intel-item">
+                                    <div class="intel-item__icon icon--shield">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="intel-item__content">
+                                        <span class="intel-title">APT28 Targets European Defense Contractors</span>
+                                        <span class="intel-time">2 hours ago</span>
+                                    </div>
+                                </div>
+
+                                <div class="intel-item">
+                                    <div class="intel-item__icon icon--zap">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                                        </svg>
+                                    </div>
+                                    <div class="intel-item__content">
+                                        <span class="intel-title">New Ransomware Variant Detected (BlackLock)</span>
+                                        <span class="intel-time">4 hours ago</span>
+                                    </div>
+                                </div>
+
+                                <div class="intel-item">
+                                    <div class="intel-item__icon icon--mail">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                                        </svg>
+                                    </div>
+                                    <div class="intel-item__content">
+                                        <span class="intel-title">Phishing Campaign Using Fake Microsoft Login</span>
+                                        <span class="intel-time">6 hours ago</span>
+                                    </div>
+                                </div>
+
+                                <div class="intel-item">
+                                    <div class="intel-item__icon icon--lock">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="intel-item__content">
+                                        <span class="intel-title">Supply Chain Attack on Open Source Libraries</span>
+                                        <span class="intel-time">8 hours ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+
+            <!-- ═══ Footer ═══ -->
+            <footer class="site-footer" id="site-footer">
+                <div class="footer-inner">
+                    <span class="footer-copy">&copy; 2026 THREAT STORM Inc. Haute Cyber Intelligence Bureau. Planetary Defense Grid.</span>
+                    <span class="footer-status">SYSTEM STATUS: ALL TELEMETRY CHANNELS ACTIVE (28 VECTORS)</span>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- ═══ Slide-over Deep Intelligence Investigation Panel ═══ -->
+    <div class="intel-overlay" id="intel-overlay" aria-hidden="true">
+        <div class="intel-panel" id="intel-panel" role="dialog" aria-labelledby="intel-title" aria-modal="true">
+            <div class="intel-panel__header" id="intel-header">
+                <div class="intel-panel__header-top">
+                    <button type="button" class="intel-panel__close" id="intel-close" aria-label="Close intelligence panel">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                    <div class="intel-panel__severity-badge" id="intel-severity-badge">CRITICAL</div>
+                    <div class="intel-panel__status-badge" id="intel-status-badge">New</div>
+                    <div class="intel-panel__cvss-badge" id="intel-cvss-badge">CVSS 9.8</div>
+                </div>
+                <h2 class="intel-panel__title" id="intel-title">Alert Title</h2>
+                <div class="intel-panel__meta" id="intel-meta">
+                    <span class="intel-panel__meta-item" id="intel-timestamp">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        <span>—</span>
+                    </span>
+                    <span class="intel-panel__meta-item" id="intel-asset">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                        <span>—</span>
+                    </span>
+                    <span class="intel-panel__meta-item" id="intel-source">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <span>—</span>
+                    </span>
+                    <span class="intel-panel__meta-item" id="intel-mitre">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        <span>MITRE: —</span>
+                    </span>
+                    <span class="intel-panel__meta-item" id="intel-region">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                        <span>—</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="intel-panel__body" id="intel-body">
+                <!-- Why Generated -->
+                <div class="intel-section" id="intel-reason">
+                    <div class="intel-section__header">
+                        <h3 class="intel-section__title">Detection Context &amp; Threat Narrative</h3>
+                    </div>
+                    <div class="intel-section__content" id="intel-reason-content"></div>
+                </div>
+
+                <!-- Correlated Technical Evidence -->
+                <div class="intel-section" id="intel-evidence">
+                    <div class="intel-section__header">
+                        <h3 class="intel-section__title">Correlated Technical Evidence</h3>
+                    </div>
+                    <div class="intel-section__content" id="intel-evidence-content"></div>
+                </div>
+
+                <!-- Confidence Assessment -->
+                <div class="intel-section" id="intel-confidence">
+                    <div class="intel-section__header">
+                        <h3 class="intel-section__title">Confidence Assessment &amp; Reliability</h3>
+                    </div>
+                    <div class="intel-section__content" id="intel-confidence-content"></div>
+                </div>
+
+                <!-- Known vs Unverified Gaps -->
+                <div class="intel-section" id="intel-known">
+                    <div class="intel-section__header">
+                        <h3 class="intel-section__title">Verified Telemetry vs. Unverified Gaps</h3>
+                    </div>
+                    <div class="intel-section__content" id="intel-known-content"></div>
+                </div>
+
+                <!-- Impact & Recommendations -->
+                <div class="intel-section" id="intel-impact">
+                    <div class="intel-section__header">
+                        <h3 class="intel-section__title">Blast Radius &amp; Defensive Recommendations</h3>
+                    </div>
+                    <div class="intel-section__content" id="intel-impact-content"></div>
+                </div>
+
+                <!-- Audit Trail -->
+                <div class="intel-section" id="intel-investigation">
+                    <div class="intel-section__header">
+                        <h3 class="intel-section__title">Investigation Audit Trail</h3>
+                    </div>
+                    <div class="intel-section__content" id="intel-investigation-content"></div>
+                </div>
+
+                <!-- Analyst Command Station -->
+                <div class="intel-actions" id="intel-actions">
+                    <h3 class="intel-actions__title">Analyst Decision Station</h3>
+                    <div class="intel-actions__group">
+                        <select class="intel-actions__status-select" id="intel-status-change" aria-label="Change investigation status">
+                            <option value="">Transition Status…</option>
+                            <option value="investigating">Mark as Investigating</option>
+                            <option value="confirmed">Confirm Incident</option>
+                            <option value="resolved">Mark Remediated</option>
+                            <option value="dismissed">Dismiss Alert</option>
+                        </select>
+                        <button type="button" class="intel-actions__btn intel-actions__btn--primary" id="intel-apply-status">Commit Status</button>
+                    </div>
+                    <div class="intel-actions__notes-group">
+                        <label class="intel-actions__notes-label" for="intel-analyst-notes">Analyst Briefing Notes</label>
+                        <textarea class="intel-actions__notes" id="intel-analyst-notes" placeholder="Record technical findings, IoCs, or mitigation notes…" rows="3"></textarea>
+                        <div class="intel-actions__note-buttons">
+                            <button type="button" class="intel-actions__btn intel-actions__btn--secondary" id="intel-save-notes">Append Note</button>
+                            <button type="button" class="intel-actions__btn intel-actions__btn--ghost" id="intel-export-json">Export Intel Package (JSON)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="threats.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
