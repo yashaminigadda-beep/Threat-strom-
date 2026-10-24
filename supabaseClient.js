@@ -6,13 +6,14 @@
 (function () {
     const STORAGE_KEY_URL = 'threatstorm_sb_url';
     const STORAGE_KEY_KEY = 'threatstorm_sb_key';
+    const DEFAULT_URL = 'https://vlwdxlwmljigbxncxqdm.supabase.co';
 
     let supabaseInstance = null;
     let isConnected = false;
 
     // Retrieve stored credentials or pre-configured environment
     function getConfig() {
-        const url = localStorage.getItem(STORAGE_KEY_URL) || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) || '';
+        const url = localStorage.getItem(STORAGE_KEY_URL) || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) || DEFAULT_URL;
         const key = localStorage.getItem(STORAGE_KEY_KEY) || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.key) || '';
         return { url: url.trim(), key: key.trim() };
     }
