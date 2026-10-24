@@ -1626,6 +1626,167 @@
                 showToast("⚡ 28/28 Planetary Sensors Responding • 0 Buffer Drops • Mean Latency 0.8ms");
             });
         }
+
+        // ── Supabase Cloud Integration Handlers ──
+        initSupabaseUI();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // SUPABASE CLOUD DATABASE UI ENGINE
+    // ═══════════════════════════════════════════════════════════
+
+    function initSupabaseUI() {
+        const inputUrl = document.getElementById('sb-input-url');
+        const inputKey = document.getElementById('sb-input-key');
+        const btnConnect = document.getElementById('btn-sb-connect');
+        const btnPush = document.getElementById('btn-sb-sync-push');
+        const btnPull = document.getElementById('btn-sb-sync-pull');
+        const btnDisconnect = document.getElementById('btn-sb-disconnect');
+        const badge = document.getElementById('sb-status-badge');
+        const statusText = document.getElementById('sb-status-text');
+        const feedback = document.getElementById('sb-feedback-box');
+
+        if (!btnConnect || !window.ThreatStormSupabase) return;
+
+        // Populate existing credentials if saved
+        const existingConfig = window.ThreatStormSupabase.getConfig();
+        if (existingConfig.url) inputUrl.value = existingConfig.url;
+        if (existingConfig.key) inputKey.value = existingConfig.key;
+
+        function updateBadge(state, text) {
+            if (!badge || !statusText) return;
+            badge.className = 'sb-status-badge';
+            if (state === 'online') {
+                badge.classList.add('sb-badge--online');
+                statusText.textContent = text || 'CONNECTED (SUPABASE CLOUD)';
+            } else if (state === 'warning') {
+                badge.classList.add('sb-badge--warning');
+                statusText.textContent = text || 'CONNECTED (SCHEMA NEEDED)';
+            } else {
+                badge.classList.add('sb-badge--offline');
+                statusText.textContent = text || 'LOCAL IN-MEMORY MODE';
+            }
+        }
+
+        function showFeedback(msg, type) {
+            if (!feedback) return;
+            feedback.style.display = 'block';
+            feedback.style.background = type === 'error' ? 'rgba(239, 68, 68, 0.12)' : (type === 'warn' ? 'rgba(212, 175, 55, 0.12)' : 'rgba(62, 207, 142, 0.12)');
+            feedback.style.border = `1px solid ${type === 'error' ? '#ef4444' : (type === 'warn' ? '#d4af37' : '#3ECF8E')}`;
+            feedback.style.color = type === 'error' ? '#fca5a5' : (type === 'warn' ? '#fde047' : '#86efac');
+            feedback.innerHTML = msg;
+        }
+
+        // Check initial state
+        if (window.ThreatStormSupabase.isConnected()) {
+            updateBadge('online', 'CONNECTED (SUPABASE CLOUD)');
+        }
+
+        // Connect button
+        btnConnect.addEventListener('click', async () => {
+            const url = inputUrl.value.trim();
+            const key = inputKey.value.trim();
+
+            if (!url || !key) {
+                showFeedback('⚠️ Please enter both your Supabase Project URL and Anon Public Key.', 'warn');
+                return;
+            }
+
+            btnConnect.disabled = true;
+            btnConnect.innerHTML = '<span>⏳ Verifying...</span>';
+            showFeedback('Verifying handshake with Supabase PostgreSQL cluster...', 'warn');
+
+            const result = await window.ThreatStormSupabase.testConnection(url, key);
+            btnConnect.disabled = false;
+            btnConnect.innerHTML = '<span>⚡ Connect &amp; Verify</span>';
+
+            if (result.success) {
+                if (result.warning) {
+                    updateBadge('warning', 'CONNECTED (SCHEMA NEEDED)');
+                    showFeedback(`✓ ${result.warning}`, 'warn');
+                    showToast('⚠️ Connected! Note: Execute supabase_schema.sql in Supabase SQL Editor.');
+                } else {
+                    updateBadge('online', `LIVE CLOUD (${result.latency}ms)`);
+                    showFeedback(`✓ Handshake verified with Supabase! Round-trip latency: ${result.latency}ms`, 'success');
+                    showToast(`⚡ Supabase Live Connected (${result.latency}ms)`);
+                }
+            } else {
+                updateBadge('offline', 'CONNECTION FAILED');
+                showFeedback(`✕ Error connecting to Supabase: ${result.message}`, 'error');
+                showToast(`✕ Supabase connection failed: ${result.message}`);
+            }
+        });
+
+        // Push Local Threats to Supabase
+        if (btnPush) {
+            btnPush.addEventListener('click', async () => {
+                btnPush.disabled = true;
+                btnPush.innerHTML = '<span>⏳ Uploading...</span>';
+                const res = await window.ThreatStormSupabase.syncLocalThreatsToCloud(alerts);
+                btnPush.disabled = false;
+                btnPush.innerHTML = '<span>☁ Push 28 Local Threats to Cloud</span>';
+
+                if (res.success) {
+                    showFeedback(`✓ ${res.message}`, 'success');
+                    showToast(`☁ Synced ${res.count} Threats to Supabase Cloud!`);
+                } else {
+                    showFeedback(`✕ Upload failed: ${res.message}`, 'error');
+                    showToast(`✕ Sync failed: ${res.message}`);
+                }
+            });
+        }
+
+        // Pull Live Threats from Supabase
+        if (btnPull) {
+            btnPull.addEventListener('click', async () => {
+                btnPull.disabled = true;
+                btnPull.innerHTML = '<span>⏳ Fetching...</span>';
+                const cloudThreats = await window.ThreatStormSupabase.fetchThreatsFromCloud();
+                btnPull.disabled = false;
+                btnPull.innerHTML = '<span>📥 Pull Cloud Incidents</span>';
+
+                if (cloudThreats && cloudThreats.length) {
+                    // Update in-memory alerts
+                    alerts = cloudThreats.map(ct => ({
+                        id: ct.id,
+                        title: ct.title,
+                        severity: ct.severity,
+                        category: ct.category,
+                        region: ct.region,
+                        lat: ct.lat,
+                        lng: ct.lng,
+                        details: ct.details,
+                        threatActor: ct.actor || 'APT_CLUSTER',
+                        aiConfidence: ct.confidence ? `${Math.round(ct.confidence * 100)}%` : '96%',
+                        status: 'active'
+                    }));
+
+                    // Re-render views
+                    renderThreatsTable();
+                    renderFullAlertsTable();
+                    renderFeedView();
+                    renderSectorView();
+
+                    showFeedback(`✓ Pulled ${cloudThreats.length} live threats from Supabase PostgreSQL database.`, 'success');
+                    showToast(`📥 Pulled ${cloudThreats.length} live threats from Supabase!`);
+                } else {
+                    showFeedback('No cloud threats found or Supabase is not connected. Push threats first or verify table.', 'warn');
+                    showToast('⚠️ No records returned from Supabase.');
+                }
+            });
+        }
+
+        // Disconnect / Reset
+        if (btnDisconnect) {
+            btnDisconnect.addEventListener('click', () => {
+                window.ThreatStormSupabase.disconnect();
+                inputUrl.value = '';
+                inputKey.value = '';
+                updateBadge('offline', 'LOCAL IN-MEMORY MODE');
+                if (feedback) feedback.style.display = 'none';
+                showToast('✓ Disconnected. Running in Local In-Memory Mode.');
+            });
+        }
     }
 
     // ═══════════════════════════════════════════════════════════

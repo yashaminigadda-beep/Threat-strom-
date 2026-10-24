@@ -2632,3 +2632,71 @@ button:active,
     border-radius: 4px;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   SUPABASE CLOUD DATABASE CONNECTOR STYLING
+   ═══════════════════════════════════════════════════════════════ */
+
+.supabase-connector-card {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.supabase-connector-card:hover {
+    border-color: rgba(56, 189, 248, 0.5) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.15) !important;
+}
+
+.sb-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.sb-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.sb-badge--offline {
+    background: rgba(148, 163, 184, 0.12);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    color: #94a3b8;
+}
+
+.sb-badge--offline .sb-status-dot {
+    background: #94a3b8;
+    box-shadow: 0 0 6px rgba(148, 163, 184, 0.6);
+}
+
+.sb-badge--online {
+    background: rgba(62, 207, 142, 0.12);
+    border: 1px solid #3ECF8E;
+    color: #3ECF8E;
+}
+
+.sb-badge--online .sb-status-dot {
+    background: #3ECF8E;
+    box-shadow: 0 0 8px #3ECF8E;
+    animation: statusPulse 1.5s infinite;
+}
+
+.sb-badge--warning {
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid var(--gold);
+    color: #ffd700;
+}
+
+.sb-badge--warning .sb-status-dot {
+    background: #ffd700;
+    box-shadow: 0 0 8px #ffd700;
+}
+
+
