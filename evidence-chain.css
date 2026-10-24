@@ -452,24 +452,25 @@
 
 /* Graph Canvas Card */
 .ev-graph-card {
-    background: var(--bg-card);
+    background: #060913;
     border: 1px solid var(--border-medium);
     border-radius: var(--radius-md);
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    min-height: 620px;
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7);
+    min-height: 660px;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8), 0 12px 36px rgba(0, 0, 0, 0.5);
 }
 
 .ev-graph-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 18px;
+    padding: 14px 20px;
     border-bottom: 1px solid var(--border-subtle);
-    background: rgba(6, 9, 19, 0.85);
+    background: rgba(6, 9, 19, 0.92);
+    backdrop-filter: blur(8px);
     z-index: 5;
 }
 
@@ -477,7 +478,7 @@
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     color: var(--gold-bright);
     display: flex;
     align-items: center;
@@ -492,8 +493,8 @@
 }
 
 .ev-control-btn {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     background: rgba(30, 58, 105, 0.25);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
@@ -502,23 +503,26 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 13px;
-    transition: all 0.18s ease;
+    font-size: 14px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .ev-control-btn:hover {
-    background: rgba(212, 175, 55, 0.18);
+    background: rgba(212, 175, 55, 0.22);
     border-color: var(--gold);
     color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.35);
 }
 
 /* SVG Graph Viewport */
 .ev-graph-viewport {
     flex: 1;
     position: relative;
-    background: radial-gradient(circle at 50% 50%, rgba(15, 24, 44, 0.6) 0%, rgba(5, 7, 15, 0.95) 100%);
+    background: radial-gradient(circle at 50% 40%, rgba(16, 28, 54, 0.5) 0%, rgba(4, 7, 15, 0.98) 100%);
     cursor: grab;
     overflow: hidden;
+    min-height: 580px;
 }
 
 .ev-graph-viewport:active {
@@ -534,23 +538,27 @@
 /* Graph Nodes Styling */
 .ev-node-group {
     cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.ev-node-group:hover {
+    transform: translate(0, -3px) scale(1.02);
 }
 
 .ev-node-group:hover .ev-node-box {
-    filter: drop-shadow(0 0 14px rgba(212, 175, 55, 0.55));
+    filter: drop-shadow(0 0 16px rgba(212, 175, 55, 0.65));
     stroke: var(--gold-bright);
-    stroke-width: 2px;
+    stroke-width: 2.2px;
 }
 
 .ev-node-group.ev-node--selected .ev-node-box {
     stroke: var(--gold-bright);
-    stroke-width: 2.4px;
-    filter: drop-shadow(0 0 18px rgba(212, 175, 55, 0.85));
+    stroke-width: 2.6px;
+    filter: drop-shadow(0 0 22px rgba(212, 175, 55, 0.9));
 }
 
 .ev-node-group.ev-node--dimmed {
-    opacity: 0.22;
+    opacity: 0.18;
 }
 
 .ev-node-group.ev-node--highlighted {
@@ -558,38 +566,39 @@
 }
 
 .ev-node-group.ev-node--highlighted .ev-node-box {
-    filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.7));
+    filter: drop-shadow(0 0 18px rgba(56, 189, 248, 0.85));
+    stroke: #38bdf8;
 }
 
 /* Edges / Relationship Paths */
 .ev-edge-path {
     fill: none;
-    stroke: rgba(70, 130, 220, 0.45);
-    stroke-width: 2px;
+    stroke: rgba(56, 189, 248, 0.5);
+    stroke-width: 2.2px;
     cursor: pointer;
     transition: all 0.25s ease;
 }
 
 .ev-edge-path:hover {
     stroke: var(--gold-bright);
-    stroke-width: 3.2px;
-    filter: drop-shadow(0 0 8px var(--gold));
+    stroke-width: 3.5px;
+    filter: drop-shadow(0 0 10px var(--gold));
 }
 
 .ev-edge-path.ev-edge--selected {
     stroke: var(--gold-bright);
-    stroke-width: 3.5px;
-    filter: drop-shadow(0 0 12px var(--gold));
+    stroke-width: 3.8px;
+    filter: drop-shadow(0 0 14px var(--gold));
 }
 
 .ev-edge-path.ev-edge--dimmed {
-    opacity: 0.15;
+    opacity: 0.12;
 }
 
 .ev-edge-path.ev-edge--highlighted {
     stroke: #38bdf8;
-    stroke-width: 3px;
-    filter: drop-shadow(0 0 10px #38bdf8);
+    stroke-width: 3.2px;
+    filter: drop-shadow(0 0 12px #38bdf8);
 }
 
 .ev-edge-path.ev-edge--disputed {
@@ -599,6 +608,17 @@
 
 .ev-edge-label-group {
     cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.ev-edge-label-group:hover {
+    transform: scale(1.08);
+}
+
+.ev-edge-label-group:hover rect {
+    stroke: var(--gold-bright);
+    stroke-width: 1.8px;
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
 }
 
 /* Graph Instructions Overlay */

@@ -403,20 +403,20 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
     let activeInspectorTab = "event"; // "event" | "evidence" | "correction"
     let searchQuery = "";
     let statusFilter = "all";
-    let transform = { x: 40, y: 30, k: 1 };
+    let transform = { x: 20, y: 15, k: 0.96 };
     let isPanning = false;
     let panStart = { x: 0, y: 0 };
 
-    // Node Positions (Hierarchical Cyber Kill Chain Layout)
+    // Node Positions (Ergonomic High-Tech Cyber Kill Chain Layout)
     const NODE_POSITIONS = {
-        "EVT-101": { x: 80,  y: 120 },
-        "EVT-102": { x: 260, y: 120 },
-        "EVT-103": { x: 260, y: 310 },
-        "EVT-104": { x: 440, y: 120 },
-        "EVT-105": { x: 620, y: 120 },
-        "EVT-106": { x: 800, y: 120 },
-        "EVT-107": { x: 980, y: 120 },
-        "EVT-108": { x: 440, y: 310 }
+        "EVT-101": { x: 135, y: 175 }, // Phase I: Initial Access
+        "EVT-102": { x: 385, y: 175 }, // Phase II: Execution & Stager
+        "EVT-103": { x: 385, y: 415 }, // Phase II Branch: Persistence Staging
+        "EVT-104": { x: 635, y: 175 }, // Phase III: Credential Harvesting
+        "EVT-108": { x: 635, y: 415 }, // Phase III Branch: Defense Evasion
+        "EVT-105": { x: 885, y: 175 }, // Phase IV: Lateral Pivot
+        "EVT-106": { x: 1135, y: 175 }, // Phase V: Collection & Staging
+        "EVT-107": { x: 1385, y: 175 }  // Phase VI: Exfiltration & Egress
     };
 
     // ═══════════════════════════════════════════════════════════
@@ -548,41 +548,98 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
         });
         const filteredNodeIds = new Set(filteredEvents.map(e => e.id));
 
+        const STAGE_ICONS = {
+            "EVT-101": "📧",
+            "EVT-102": "⚡",
+            "EVT-103": "⏰",
+            "EVT-104": "🔑",
+            "EVT-105": "🔄",
+            "EVT-106": "💾",
+            "EVT-107": "🌐",
+            "EVT-108": "🛡️"
+        };
+
+        const STAGE_COLUMNS = [
+            { num: "PHASE I", title: "INITIAL ACCESS", x: 20, cx: 135 },
+            { num: "PHASE II", title: "EXECUTION & C2", x: 270, cx: 385 },
+            { num: "PHASE III", title: "CREDENTIAL ACCESS", x: 520, cx: 635 },
+            { num: "PHASE IV", title: "LATERAL PIVOT", x: 770, cx: 885 },
+            { num: "PHASE V", title: "COLLECTION & STAGE", x: 1020, cx: 1135 },
+            { num: "PHASE VI", title: "EXFILTRATION", x: 1270, cx: 1385 }
+        ];
+
         // Build SVG content inside a pan-zoom group
         let html = `
             <defs>
                 <filter id="ev-glow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <feGaussianBlur stdDeviation="3.5" result="blur"/>
                     <feComposite in="SourceGraphic" in2="blur" operator="over"/>
                 </filter>
-                <marker id="ev-arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                    <path d="M 0 1 L 9 5 L 0 9 z" fill="#38bdf8"/>
+                <filter id="ev-shadow" x="-10%" y="-10%" width="120%" height="120%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.8"/>
+                </filter>
+                <linearGradient id="ev-node-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#0d182e"/>
+                    <stop offset="100%" stop-color="#050813"/>
+                </linearGradient>
+                <linearGradient id="ev-node-grad-active" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#142647"/>
+                    <stop offset="100%" stop-color="#070c1a"/>
+                </linearGradient>
+                <marker id="ev-arrow" viewBox="0 0 10 10" refX="24" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#38bdf8"/>
                 </marker>
-                <marker id="ev-arrow-gold" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <marker id="ev-arrow-gold" viewBox="0 0 10 10" refX="24" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                     <path d="M 0 1 L 9 5 L 0 9 z" fill="#d4af37"/>
                 </marker>
-                <marker id="ev-arrow-disputed" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                    <path d="M 0 1 L 9 5 L 0 9 z" fill="#ff2d55"/>
+                <marker id="ev-arrow-disputed" viewBox="0 0 10 10" refX="24" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#ff2d55"/>
                 </marker>
             </defs>
             <g transform="translate(${transform.x}, ${transform.y}) scale(${transform.k})" id="ev-graph-root">
-                <!-- Background Grid Lines -->
-                <g class="ev-grid-lines" opacity="0.12">
-                    ${Array.from({ length: 14 }).map((_, i) => `<line x1="${i * 90}" y1="0" x2="${i * 90}" y2="520" stroke="#38bdf8" stroke-dasharray="2 4"/>`).join('')}
-                    ${Array.from({ length: 7 }).map((_, i) => `<line x1="0" y1="${i * 80}" x2="1180" y2="${i * 80}" stroke="#38bdf8" stroke-dasharray="2 4"/>`).join('')}
+
+                <!-- Tactical Grid Background & Range Rings -->
+                <g class="ev-grid-lines" opacity="0.15">
+                    ${Array.from({ length: 18 }).map((_, i) => `<line x1="${i * 90}" y1="0" x2="${i * 90}" y2="560" stroke="#38bdf8" stroke-dasharray="2 5"/>`).join('')}
+                    ${Array.from({ length: 8 }).map((_, i) => `<line x1="0" y1="${i * 80}" x2="1540" y2="${i * 80}" stroke="#38bdf8" stroke-dasharray="2 5"/>`).join('')}
+                    <circle cx="770" cy="280" r="380" fill="none" stroke="#38bdf8" stroke-width="0.7" stroke-dasharray="3 7"/>
+                    <circle cx="770" cy="280" r="220" fill="none" stroke="#d4af37" stroke-width="0.6" stroke-dasharray="4 8"/>
                 </g>
 
-                <!-- Kill Chain Stages Labels -->
-                <g class="ev-stage-headers" opacity="0.4" font-family="JetBrains Mono" font-size="9" fill="#90a0b8">
-                    <text x="80" y="35" text-anchor="middle">INITIAL ACCESS</text>
-                    <text x="260" y="35" text-anchor="middle">EXECUTION</text>
-                    <text x="440" y="35" text-anchor="middle">CREDENTIAL ACCESS</text>
-                    <text x="620" y="35" text-anchor="middle">LATERAL PIVOT</text>
-                    <text x="800" y="35" text-anchor="middle">COLLECTION</text>
-                    <text x="980" y="35" text-anchor="middle">EXFILTRATION</text>
+                <!-- High-Tech Glassmorphic Vertical Stage Columns -->
+                <g class="ev-stage-columns-layer">
+                    ${STAGE_COLUMNS.map(col => `
+                        <g class="ev-stage-col-group">
+                            <rect x="${col.x}" y="20" width="230" height="520" rx="14"
+                                  fill="rgba(6, 10, 22, 0.45)" stroke="rgba(30, 58, 105, 0.35)" stroke-width="1.2"/>
+                            <rect x="${col.x}" y="20" width="230" height="55" rx="14"
+                                  fill="rgba(10, 16, 32, 0.65)" stroke="none"/>
+                            <line x1="${col.x + 25}" y1="20" x2="${col.x + 205}" y2="20"
+                                  stroke="rgba(212, 175, 55, 0.65)" stroke-width="2"/>
+                            <text x="${col.cx}" y="42" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" font-weight="700" fill="var(--gold-bright)" letter-spacing="0.14em">
+                                ${col.num}
+                            </text>
+                            <text x="${col.cx}" y="58" text-anchor="middle" font-family="Cinzel" font-size="9.5" font-weight="700" fill="#f0f4fa" letter-spacing="0.08em">
+                                ${col.title}
+                            </text>
+                            <line x1="${col.x + 40}" y1="67" x2="${col.x + 190}" y2="67"
+                                  stroke="rgba(56, 189, 248, 0.2)" stroke-width="0.8" stroke-dasharray="2 3"/>
+                        </g>
+                    `).join('')}
                 </g>
 
-                <!-- Edges (Relationships) -->
+                <!-- Corner Tactical Reticles -->
+                <g class="ev-corner-reticles" stroke="rgba(212, 175, 55, 0.5)" stroke-width="1.5" fill="none">
+                    <path d="M 12 30 L 12 12 L 30 12"/>
+                    <path d="M 1528 30 L 1528 12 L 1510 12"/>
+                    <path d="M 12 525 L 12 543 L 30 543"/>
+                    <path d="M 1528 525 L 1528 543 L 1510 543"/>
+                    <text x="22" y="556" font-family="JetBrains Mono" font-size="8.5" fill="rgba(144, 160, 184, 0.45)" stroke="none">
+                        [SYS_GRID // TELEMETRY GRID 8841.04 // SECTOR: FINANCIAL CORE // APT-VANGUARD]
+                    </text>
+                </g>
+
+                <!-- Edges Layer (Animated Luminous Conduits) -->
                 <g class="ev-edges-layer">
         `;
 
@@ -602,13 +659,35 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
             if (isSelected) marker = "url(#ev-arrow-gold)";
             if (rel.verification === "disputed") marker = "url(#ev-arrow-disputed)";
 
-            // Curved quadratic bezier path
-            const dx = p2.x - p1.x;
-            const dy = p2.y - p1.y;
-            const cx = p1.x + dx / 2;
-            const cy = p1.y + dy / 2 - (dx === 0 ? 0 : 20);
+            // Node width 210, height 100
+            let startX, startY, endX, endY, cx, cy;
+            if (p1.y === p2.y) {
+                // Horizontal direct kill-chain flow
+                startX = p1.x + 105;
+                startY = p1.y;
+                endX = p2.x - 105;
+                endY = p2.y;
+                cx = (startX + endX) / 2;
+                cy = startY - 14;
+            } else if (p1.x === p2.x) {
+                // Vertical downward branch (EVT-102 -> EVT-103)
+                startX = p1.x;
+                startY = p1.y + 50;
+                endX = p2.x;
+                endY = p2.y - 50;
+                cx = startX + 38;
+                cy = (startY + endY) / 2;
+            } else {
+                // Cross / Diagonal branch (EVT-103 -> EVT-108)
+                startX = p1.x + 105;
+                startY = p1.y;
+                endX = p2.x - 105;
+                endY = p2.y;
+                cx = (startX + endX) / 2;
+                cy = (startY + endY) / 2 - 16;
+            }
 
-            const pathD = `M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}`;
+            const pathD = `M ${startX} ${startY} Q ${cx} ${cy} ${endX} ${endY}`;
 
             let edgeClasses = "ev-edge-path";
             if (isSelected) edgeClasses += " ev-edge--selected";
@@ -616,13 +695,33 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
             if (isDimmed) edgeClasses += " ev-edge--dimmed";
             if (rel.verification === "disputed") edgeClasses += " ev-edge--disputed";
 
+            const conduitColor = isSelected ? '#d4af37' : (rel.verification === 'disputed' ? '#ff2d55' : (isHighlighted ? '#38bdf8' : 'rgba(56, 189, 248, 0.45)'));
+            const pulseColor = isSelected ? '#f3d47c' : (rel.verification === 'disputed' ? '#ff2d55' : '#38bdf8');
+
             html += `
-                <path d="${pathD}" class="${edgeClasses}" data-rel-id="${rel.id}" marker-end="${marker}"/>
-                <!-- Edge Label Badge -->
+                <!-- Outer Soft Glow Conduit -->
+                <path d="${pathD}" stroke="${conduitColor}" stroke-width="${isSelected ? 6 : 3.5}" opacity="${isDimmed ? 0.08 : 0.22}" fill="none"/>
+
+                <!-- Core Laser Conduit Wire -->
+                <path id="path-${rel.id}" d="${pathD}" class="${edgeClasses}" data-rel-id="${rel.id}" marker-end="${marker}"/>
+
+                <!-- Animated Data Packet Pulse Traveling Along Conduit -->
+                ${!isDimmed ? `
+                    <circle r="3.5" fill="${pulseColor}" filter="url(#ev-glow)">
+                        <animateMotion dur="${isSelected ? '1.8s' : '2.8s'}" repeatCount="indefinite" path="${pathD}"/>
+                    </circle>
+                ` : ''}
+
+                <!-- Edge Correlation Rule Badge with Confidence Pill -->
                 <g class="ev-edge-label-group" data-rel-id="${rel.id}" transform="translate(${cx}, ${cy})">
-                    <rect x="-38" y="-10" width="76" height="20" rx="4" fill="#060913" stroke="${isSelected ? '#d4af37' : 'rgba(56,189,248,0.4)'}" stroke-width="1"/>
-                    <text x="0" y="3" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" font-weight="600" fill="${isSelected ? '#f3d47c' : '#90a0b8'}">
-                        ${rel.confidence}% • ${rel.ruleId}
+                    <rect x="-44" y="-12" width="88" height="24" rx="6"
+                          fill="#060913" stroke="${isSelected ? 'var(--gold)' : (rel.verification === 'disputed' ? '#ff2d55' : 'rgba(56, 189, 248, 0.45)')}"
+                          stroke-width="${isSelected ? 1.6 : 1}" filter="url(#ev-shadow)"/>
+                    <text x="0" y="-1" text-anchor="middle" font-family="JetBrains Mono" font-size="8" font-weight="700" fill="${isSelected ? '#f3d47c' : '#38bdf8'}">
+                        ${rel.ruleId}
+                    </text>
+                    <text x="0" y="8" text-anchor="middle" font-family="JetBrains Mono" font-size="7.5" font-weight="600" fill="${rel.confidence >= 80 ? '#00e676' : (rel.confidence >= 50 ? '#f59e0b' : '#ff2d55')}">
+                        ● ${rel.confidence}% CONF.
                     </text>
                 </g>
             `;
@@ -630,7 +729,7 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
 
         html += `</g><g class="ev-nodes-layer">`;
 
-        // Nodes (Events)
+        // Nodes (Tactical Cyber HUD Cards)
         investigation.events.forEach(evt => {
             const pos = NODE_POSITIONS[evt.id];
             if (!pos) return;
@@ -653,51 +752,80 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
             if (evt.status === "unverified") statusColor = "#c084fc";
             if (evt.status === "disputed") statusColor = "#ff2d55";
 
-            // Card dimensions
-            const w = 150;
-            const h = 76;
+            const icon = STAGE_ICONS[evt.id] || "🛡️";
+
+            // Card dimensions: generous, readable, luxurious
+            const w = 210;
+            const h = 100;
             const nx = pos.x - w / 2;
             const ny = pos.y - h / 2;
 
+            const verifiedCount = evt.requiredEvidence.filter(e => e.status === 'present').length;
+            const totalCount = evt.requiredEvidence.length;
+
             html += `
                 <g class="${nodeClasses}" data-node-id="${evt.id}" transform="translate(${nx}, ${ny})">
-                    <!-- Node Body Box -->
-                    <rect class="ev-node-box" width="${w}" height="${h}" rx="8"
-                          fill="#090e1a" stroke="${isSelected ? '#f3d47c' : statusColor}" stroke-width="${isSelected ? 2.4 : 1.4}" />
+                    <!-- Drop Shadow / Radiant Neon Glow Behind Selected Node -->
+                    ${isSelected ? `
+                        <rect x="-4" y="-4" width="${w + 8}" height="${h + 8}" rx="14"
+                              fill="none" stroke="${statusColor}" stroke-width="1.8" filter="url(#ev-glow)" opacity="0.85"/>
+                    ` : ''}
 
-                    <!-- Header Accent Bar -->
+                    <!-- Main Card Body -->
+                    <rect class="ev-node-box" width="${w}" height="${h}" rx="10"
+                          fill="${isSelected ? 'url(#ev-node-grad-active)' : 'url(#ev-node-grad)'}"
+                          stroke="${isSelected ? '#f3d47c' : statusColor}" stroke-width="${isSelected ? 2.2 : 1.2}"
+                          filter="url(#ev-shadow)"/>
+
+                    <!-- Top Glow Accent Bar -->
                     <rect x="0" y="0" width="${w}" height="4" rx="2" fill="${statusColor}" />
 
-                    <!-- Event ID & MITRE Pill -->
-                    <text x="8" y="18" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="${statusColor}">
+                    <!-- Tactical Stage Icon + Event ID -->
+                    <circle cx="18" cy="19" r="8.5" fill="rgba(0,0,0,0.6)" stroke="${statusColor}55" stroke-width="1"/>
+                    <text x="18" y="22.5" text-anchor="middle" font-size="9">${icon}</text>
+
+                    <text x="32" y="22" font-family="JetBrains Mono" font-size="10.5" font-weight="700" fill="${statusColor}">
                         ${evt.id}
                     </text>
-                    <rect x="74" y="8" width="68" height="13" rx="3" fill="rgba(56,189,248,0.12)" stroke="rgba(56,189,248,0.3)" stroke-width="0.8"/>
-                    <text x="108" y="17.5" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#38bdf8">
+
+                    <!-- MITRE Tag with Cyan Glow -->
+                    <rect x="${w - 74}" y="10" width="66" height="15" rx="4"
+                          fill="rgba(6, 182, 212, 0.12)" stroke="rgba(56, 189, 248, 0.45)" stroke-width="0.9"/>
+                    <text x="${w - 41}" y="20.5" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" font-weight="600" fill="#38bdf8">
                         ${evt.mitre}
                     </text>
 
-                    <!-- Event Title (Truncated if long) -->
-                    <text x="8" y="34" font-family="Inter" font-size="10" font-weight="600" fill="#f0f4fa">
-                        ${evt.title.length > 20 ? evt.title.substring(0, 18) + '…' : evt.title}
+                    <!-- Event Title (Clean, Crisp Typography) -->
+                    <text x="10" y="42" font-family="Inter" font-size="11" font-weight="700" fill="#ffffff">
+                        ${evt.title.length > 25 ? evt.title.substring(0, 23) + '…' : evt.title}
                     </text>
 
-                    <!-- Host Asset -->
-                    <text x="8" y="48" font-family="JetBrains Mono" font-size="8.5" fill="#90a0b8">
-                        🖥️ ${evt.asset.split('.')[0]}
+                    <!-- Host Machine Chip -->
+                    <rect x="10" y="52" width="${w - 20}" height="17" rx="3"
+                          fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.06)" stroke-width="0.7"/>
+                    <text x="16" y="64" font-family="JetBrains Mono" font-size="8.5" fill="#94a3b8">
+                        🖥️ ${evt.asset.split('.')[0]} • <tspan fill="#64748b">${evt.telemetry.split(' ')[0]}</tspan>
                     </text>
 
-                    <!-- Status Pill at Bottom -->
-                    <rect x="8" y="55" width="70" height="14" rx="7" fill="rgba(0,0,0,0.5)" stroke="${statusColor}" stroke-width="0.7"/>
-                    <circle cx="16" cy="62" r="3" fill="${statusColor}"/>
-                    <text x="24" y="65" font-family="JetBrains Mono" font-size="7.5" font-weight="600" fill="#ffffff" text-transform="uppercase">
+                    <!-- Bottom Status Strip -->
+                    <rect x="10" y="75" width="86" height="16" rx="8"
+                          fill="rgba(0,0,0,0.65)" stroke="${statusColor}66" stroke-width="0.9"/>
+                    <circle cx="20" cy="83" r="3.5" fill="${statusColor}" filter="url(#ev-glow)"/>
+                    <text x="28" y="86" font-family="JetBrains Mono" font-size="8" font-weight="700" fill="#ffffff" text-transform="uppercase">
                         ${evt.status}
                     </text>
 
-                    <!-- Telemetry Health Warning Dot -->
+                    <!-- Evidence Verified Metric Badge on Right -->
+                    <rect x="${w - 88}" y="75" width="78" height="16" rx="8"
+                          fill="rgba(0,0,0,0.45)" stroke="rgba(212,175,55,0.3)" stroke-width="0.7"/>
+                    <text x="${w - 49}" y="86" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="var(--gold-bright)">
+                        ✓ ${verifiedCount}/${totalCount} Ev.
+                    </text>
+
+                    <!-- Warning Indicator Pill if Telemetry Issue -->
                     ${evt.telemetryHealth === 'warning' ? `
-                        <circle cx="${w - 12}" cy="62" r="5" fill="#f59e0b" filter="url(#ev-glow)"/>
-                        <text x="${w - 14}" y="65" font-family="Inter" font-size="8" font-weight="700" fill="#000000">!</text>
+                        <circle cx="${w - 8}" cy="10" r="5" fill="#f59e0b" filter="url(#ev-glow)"/>
+                        <text x="${w - 10}" y="13" font-family="Inter" font-size="7.5" font-weight="900" fill="#000000">!</text>
                     ` : ''}
                 </g>
             `;
