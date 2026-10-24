@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="evidence-chain.css">
 </head>
 <body class="dashboard-body">
 
@@ -54,6 +55,17 @@
                         <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                     </svg>
                     <span>Threat Map</span>
+                </a>
+                <a href="#evidence-chain" class="nav-item" id="menu-evidence-chain">
+                    <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="6" cy="6" r="3"/>
+                        <circle cx="18" cy="18" r="3"/>
+                        <circle cx="18" cy="6" r="3"/>
+                        <path d="M8.5 7.5L15.5 16.5"/>
+                        <path d="M9 6h6"/>
+                    </svg>
+                    <span>EvidenceChain</span>
+                    <span class="nav-badge-new">NEW</span>
                 </a>
                 <a href="#recent-threats-section" class="nav-item" id="menu-feed">
                     <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -120,6 +132,7 @@
                 <!-- Center Navigation Tabs -->
                 <nav class="top-nav__tabs">
                     <button type="button" class="tab-pill tab-pill--active" id="tab-planetary">Planetary Threat Map</button>
+                    <button type="button" class="tab-pill" id="tab-evidence-chain">EvidenceChain</button>
                     <button type="button" class="tab-pill" id="tab-feed">Intelligence Feed</button>
                     <button type="button" class="tab-pill" id="tab-sector">Sector Matrix</button>
                     <button type="button" class="tab-pill" id="tab-reports">Reports</button>
@@ -147,6 +160,198 @@
 
             <!-- ═══ Scrollable Dashboard Content ═══ -->
             <main class="dashboard-content" id="main-content">
+
+                <!-- ═══ EvidenceChain™ Forensic Correlation Module ═══ -->
+                <section class="evidence-chain-section" id="evidence-chain" aria-label="EvidenceChain Forensic Correlation Graph">
+                    
+                    <!-- Top Investigation Header -->
+                    <div class="ev-header-card">
+                        <div class="ev-header-content">
+                            <div class="ev-title-area">
+                                <div class="ev-title-badge-row">
+                                    <span class="ev-badge-chip ev-chip--gold">EVIDENCECHAIN™ v2.5</span>
+                                    <span class="ev-badge-chip ev-chip--crit">CRITICAL • CVSS 9.8</span>
+                                    <span class="ev-badge-chip ev-chip--sample">DETERMINISTIC SAMPLE INVESTIGATION</span>
+                                    <span class="ev-badge-chip ev-chip--gold">ID: INC-2026-8841</span>
+                                </div>
+                                <h2 class="ev-main-title">
+                                    <span>SolarStorm APT: Domain Controller Compromise &amp; Exfiltration</span>
+                                </h2>
+                                <p class="ev-subtitle">
+                                    Interactive event correlation graph illustrating causal attack progression from spearphishing execution to encrypted egress. Verified sensor telemetry is linked via explicit deterministic correlation rules.
+                                </p>
+                            </div>
+
+                            <div class="ev-header-actions">
+                                <button type="button" class="ev-btn ev-btn--primary" id="ev-btn-open-export">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                        <polyline points="7 10 12 15 17 10"/>
+                                        <line x1="12" y1="15" x2="12" y2="3"/>
+                                    </svg>
+                                    <span>Export Report</span>
+                                </button>
+                                <button type="button" class="ev-btn ev-btn--secondary" id="ev-btn-export-json">
+                                    <span>JSON Dossier</span>
+                                </button>
+                                <button type="button" class="ev-btn ev-btn--ghost" id="ev-btn-export-md">
+                                    <span>Markdown</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Telemetry Completeness & Health Metrics Strip -->
+                    <div class="ev-stats-strip">
+                        <!-- Evidence Completeness Meter -->
+                        <div class="ev-stat-card">
+                            <div class="ev-stat-label">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                                <span>Evidence Completeness Score</span>
+                            </div>
+                            <div class="ev-stat-value-row">
+                                <span class="ev-stat-num" id="ev-completeness-num">81%</span>
+                                <span class="ev-stat-sub" id="ev-completeness-sub">21/26 Evidence Points Verified</span>
+                            </div>
+                            <div class="ev-completeness-track">
+                                <div class="ev-completeness-fill" id="ev-completeness-fill" style="width: 81%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Confirmed Events -->
+                        <div class="ev-stat-card">
+                            <div class="ev-stat-label">
+                                <span class="ev-pill-dot ev-dot--confirmed"></span>
+                                <span>Confirmed Observations</span>
+                            </div>
+                            <div class="ev-stat-value-row">
+                                <span class="ev-stat-num" id="ev-stat-confirmed-num" style="color: #00e676;">4/8</span>
+                                <span class="ev-stat-sub">Cryptographically signed</span>
+                            </div>
+                        </div>
+
+                        <!-- Active Correlation Edges -->
+                        <div class="ev-stat-card">
+                            <div class="ev-stat-label">
+                                <span class="ev-pill-dot ev-dot--suspected"></span>
+                                <span>Correlation Rules</span>
+                            </div>
+                            <div class="ev-stat-value-row">
+                                <span class="ev-stat-num" style="color: #38bdf8;">7 Links</span>
+                                <span class="ev-stat-sub">Mean Conf. 84.6%</span>
+                            </div>
+                        </div>
+
+                        <!-- Telemetry Gaps -->
+                        <div class="ev-stat-card">
+                            <div class="ev-stat-label">
+                                <span class="ev-pill-dot ev-dot--disputed"></span>
+                                <span>Telemetry Alerts</span>
+                            </div>
+                            <div class="ev-stat-value-row">
+                                <span class="ev-stat-num" style="color: #f59e0b;">2 Warnings</span>
+                                <span class="ev-stat-sub">Buffer drops &amp; DC lag</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Telemetry Sensor Warning Banner -->
+                    <div class="ev-telemetry-warning-box">
+                        <div class="ev-warning-left">
+                            <span class="ev-warning-icon">⚠️</span>
+                            <div class="ev-warning-text">
+                                <strong>Telemetry Warning WARN-01 &amp; WARN-02:</strong> Ring buffer packet drop on <code>ws-fin-042</code> between 14:18-14:21 UTC (Edge REL-04 unverified). Domain controller security audit log stream delayed by 12.4 minutes.
+                            </div>
+                        </div>
+                        <div class="ev-warning-tags">
+                            <span class="ev-warning-tag">PCAP DROP</span>
+                            <span class="ev-warning-tag">AUDIT DELAY: 12.4m</span>
+                            <span class="ev-warning-tag">TARGET: dc-auth-prod-03</span>
+                        </div>
+                    </div>
+
+                    <!-- Graph Controls & Filters Toolbar -->
+                    <div class="ev-toolbar-card">
+                        <div class="ev-toolbar-left">
+                            <div class="ev-search-input-wrap">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                                </svg>
+                                <input type="text" class="ev-search-input" id="ev-search-input" placeholder="Search events, MITRE, assets, IOCs…" aria-label="Search EvidenceChain events">
+                            </div>
+
+                            <select class="ev-select-filter" id="ev-status-filter" aria-label="Filter events by verification status">
+                                <option value="all">All Verification Statuses (8)</option>
+                                <option value="confirmed">Confirmed Observations</option>
+                                <option value="suspected">Suspected Events</option>
+                                <option value="unverified">Unverified Connections</option>
+                                <option value="disputed">Disputed Events</option>
+                            </select>
+                        </div>
+
+                        <div class="ev-toolbar-right">
+                            <div class="ev-legend-pills">
+                                <span class="ev-legend-pill"><span class="ev-pill-dot ev-dot--confirmed"></span> Confirmed</span>
+                                <span class="ev-legend-pill"><span class="ev-pill-dot ev-dot--suspected"></span> Suspected</span>
+                                <span class="ev-legend-pill"><span class="ev-pill-dot ev-dot--unverified"></span> Unverified</span>
+                                <span class="ev-legend-pill"><span class="ev-pill-dot ev-dot--disputed"></span> Disputed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Graph & Details Workspace -->
+                    <div class="ev-workspace-grid">
+                        
+                        <!-- Left: Interactive Event Graph Card -->
+                        <div class="ev-graph-card">
+                            <div class="ev-graph-header">
+                                <div class="ev-graph-title">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="18" cy="6" r="3"/>
+                                        <path d="M8.5 7.5L15.5 16.5"/><path d="M9 6h6"/>
+                                    </svg>
+                                    <span>FORENSIC CORRELATION GRAPH (CLICK NODE OR EDGE TO INSPECT)</span>
+                                </div>
+                                <div class="ev-graph-controls">
+                                    <button type="button" class="ev-control-btn" id="ev-zoom-in" title="Zoom in">+</button>
+                                    <button type="button" class="ev-control-btn" id="ev-zoom-out" title="Zoom out">−</button>
+                                    <button type="button" class="ev-control-btn" id="ev-zoom-reset" title="Reset view &amp; filter">↺</button>
+                                </div>
+                            </div>
+
+                            <div class="ev-graph-viewport" id="ev-graph-viewport">
+                                <svg class="ev-graph-svg" id="ev-graph-svg" viewBox="0 0 1140 460" preserveAspectRatio="xMidYMid meet"></svg>
+                                <div class="ev-graph-watermark-hint">
+                                    <span>🖱️ Click node to highlight attack path • Click edge to inspect correlation rationale • Drag to pan</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Event & Evidence Inspector Card -->
+                        <div class="ev-inspector-card" id="ev-inspector-card">
+                            <div class="ev-inspector-tabs">
+                                <button type="button" class="ev-inspector-tab ev-tab--active" data-tab="event">
+                                    Event Details
+                                </button>
+                                <button type="button" class="ev-inspector-tab" data-tab="evidence">
+                                    Correlation Rule
+                                </button>
+                                <button type="button" class="ev-inspector-tab" data-tab="correction">
+                                    Analyst Gate
+                                </button>
+                            </div>
+
+                            <div class="ev-inspector-body" id="ev-inspector-body">
+                                <!-- Dynamically populated by evidence-chain.js -->
+                            </div>
+                        </div>
+
+                    </div>
+
+                </section>
 
                 <!-- ═══ 1. Hero Section: Editorial Headline & 3D Rotating Earth Globe ═══ -->
                 <section class="hero-section" id="hero-section">
@@ -870,7 +1075,37 @@
         </div>
     </div>
 
+    <!-- ═══ EvidenceChain Export Modal ═══ -->
+    <div class="ev-modal-overlay" id="ev-export-modal" role="dialog" aria-modal="true" aria-labelledby="ev-modal-title">
+        <div class="ev-modal-container">
+            <div class="ev-modal-header">
+                <h3 class="ev-modal-title" id="ev-modal-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    <span>Export EvidenceChain™ Forensic Dossier</span>
+                </h3>
+                <button type="button" class="ev-modal-close-btn" id="ev-modal-close" aria-label="Close export dialog">&times;</button>
+            </div>
+            <div class="ev-modal-body" id="ev-modal-preview-content">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="ev-modal-footer">
+                <button type="button" class="ev-btn ev-btn--secondary" onclick="window.print()">
+                    <span>Print Summary</span>
+                </button>
+                <button type="button" class="ev-btn ev-btn--primary" onclick="window.EvidenceChainEngine.exportJson()">
+                    <span>Download JSON Dossier</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="threats.js"></script>
     <script src="app.js"></script>
+    <script src="evidence-chain.js"></script>
 </body>
 </html>

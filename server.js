@@ -15,7 +15,24 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-    let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url.split('?')[0]);
+    // ── Safe API Router for EvidenceChain ──
+    const urlPath = req.url.split('?')[0];
+    if (urlPath === '/api/evidence-chain' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=UTF-8' });
+        res.end(JSON.stringify({
+            status: "success",
+            investigationId: "INC-2026-8841",
+            title: "SolarStorm APT: Multi-Stage Domain Controller Compromise & Egress",
+            classification: "Synthetic Deterministic Sample Investigation (SOC Verification)",
+            leadAnalyst: "Commander Yash K. (Haute Intelligence Bureau)",
+            source: "Threat Storm Telemetry Correlation Gateway v2.5.0",
+            verified: true
+        }));
+        return;
+    }
+
+    // ── Static Asset Serving (Original Untouched Behavior) ──
+    let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : urlPath);
     
     fs.readFile(filePath, (err, content) => {
         if (err) {
