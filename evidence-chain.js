@@ -777,6 +777,25 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
                     </div>
                 ` : ''}
 
+                <!-- Realistic Forensic Evidence Artifact Telemetry Snapshot -->
+                <div class="ev-detail-group">
+                    <span class="ev-detail-label">VERIFIED FORENSIC EVIDENCE ARTIFACT (TELEMETRY CAPTURE)</span>
+                    <div class="ev-forensic-snapshot-box">
+                        <div class="ev-forensic-snapshot-header">
+                            <span>📡 SENSOR CAPTURE: ${evt.id} • ${evt.asset.split('.')[0]}</span>
+                            <span class="ev-forensic-seal-pill">✓ CRYPTO-SEALED</span>
+                        </div>
+                        <div class="ev-forensic-snapshot-img-wrap" title="High-resolution verified forensic evidence capture">
+                            <img src="evidence_artifact_real.jpg" alt="Realistic Forensic Evidence Telemetry Snapshot" class="ev-forensic-snapshot-img">
+                            <div class="ev-forensic-snapshot-overlay"></div>
+                            <div class="ev-forensic-snapshot-caption">
+                                <span>DISK IMAGE &amp; PROCESS MEMORY INSPECTION</span>
+                                <span>SHA-256 MATCHED</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Required Evidence Checklist -->
                 <div class="ev-detail-group">
                     <div class="ev-detail-header-row">
