@@ -523,9 +523,14 @@
     cursor: grab;
     overflow: hidden;
     min-height: 580px;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
 }
 
-.ev-graph-viewport:active {
+.ev-graph-viewport:active,
+.ev-graph-viewport.is-dragging {
     cursor: grabbing;
 }
 
@@ -533,16 +538,13 @@
     width: 100%;
     height: 100%;
     display: block;
+    touch-action: none;
 }
 
 /* Graph Nodes Styling */
 .ev-node-group {
     cursor: pointer;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-}
-
-.ev-node-group:hover {
-    transform: translate(0, -3px) scale(1.02);
+    transition: opacity 0.3s ease;
 }
 
 .ev-node-group:hover .ev-node-box {
@@ -576,7 +578,7 @@
     stroke: rgba(56, 189, 248, 0.5);
     stroke-width: 2.2px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: stroke 0.2s ease, stroke-width 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
 }
 
 .ev-edge-path:hover {
@@ -608,17 +610,12 @@
 
 .ev-edge-label-group {
     cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.ev-edge-label-group:hover {
-    transform: scale(1.08);
 }
 
 .ev-edge-label-group:hover rect {
     stroke: var(--gold-bright);
     stroke-width: 1.8px;
-    box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6));
 }
 
 /* Graph Instructions Overlay */
@@ -1145,5 +1142,25 @@
     border-radius: var(--radius-pill);
     font-size: 8px;
     font-weight: 700;
+}
+
+/* Scoped Touch & Button Stability (Overrides Global Button Distortions) */
+.evidence-chain-section button:active,
+.evidence-chain-section .ev-control-btn:active,
+.evidence-chain-section .ev-status-opt-btn:active,
+.evidence-chain-section .ev-reevaluate-btn:active,
+.evidence-chain-section .ev-btn:active {
+    transform: translateY(1px) !important;
+}
+
+.evidence-chain-section .ev-status-opt-btn.ev-opt--active {
+    background: rgba(212, 175, 55, 0.22) !important;
+    border-color: var(--gold) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3) !important;
+}
+
+.evidence-chain-section .ev-graph-viewport {
+    touch-action: pan-y;
 }
 

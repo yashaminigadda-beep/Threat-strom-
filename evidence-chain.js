@@ -659,32 +659,32 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
             if (isSelected) marker = "url(#ev-arrow-gold)";
             if (rel.verification === "disputed") marker = "url(#ev-arrow-disputed)";
 
-            // Node width 210, height 100
+            // Node width 186, height 94 (generous 64px clearance between columns)
             let startX, startY, endX, endY, cx, cy;
             if (p1.y === p2.y) {
                 // Horizontal direct kill-chain flow
-                startX = p1.x + 105;
+                startX = p1.x + 93;
                 startY = p1.y;
-                endX = p2.x - 105;
+                endX = p2.x - 93;
                 endY = p2.y;
                 cx = (startX + endX) / 2;
-                cy = startY - 14;
+                cy = startY - 26; // Arched upward to clear card bodies
             } else if (p1.x === p2.x) {
                 // Vertical downward branch (EVT-102 -> EVT-103)
                 startX = p1.x;
-                startY = p1.y + 50;
+                startY = p1.y + 47;
                 endX = p2.x;
-                endY = p2.y - 50;
-                cx = startX + 38;
+                endY = p2.y - 47;
+                cx = startX + 36;
                 cy = (startY + endY) / 2;
             } else {
-                // Cross / Diagonal branch (EVT-103 -> EVT-108)
-                startX = p1.x + 105;
+                // Diagonal branch (EVT-103 -> EVT-108)
+                startX = p1.x + 93;
                 startY = p1.y;
-                endX = p2.x - 105;
+                endX = p2.x - 93;
                 endY = p2.y;
                 cx = (startX + endX) / 2;
-                cy = (startY + endY) / 2 - 16;
+                cy = 476; // Arched below card bottoms (bottom is 462)
             }
 
             const pathD = `M ${startX} ${startY} Q ${cx} ${cy} ${endX} ${endY}`;
@@ -697,13 +697,14 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
 
             const conduitColor = isSelected ? '#d4af37' : (rel.verification === 'disputed' ? '#ff2d55' : (isHighlighted ? '#38bdf8' : 'rgba(56, 189, 248, 0.45)'));
             const pulseColor = isSelected ? '#f3d47c' : (rel.verification === 'disputed' ? '#ff2d55' : '#38bdf8');
+            const defaultBadgeStroke = rel.verification === 'disputed' ? '#ff2d55' : 'rgba(56, 189, 248, 0.45)';
 
             html += `
                 <!-- Outer Soft Glow Conduit -->
                 <path d="${pathD}" stroke="${conduitColor}" stroke-width="${isSelected ? 6 : 3.5}" opacity="${isDimmed ? 0.08 : 0.22}" fill="none"/>
 
                 <!-- Core Laser Conduit Wire -->
-                <path id="path-${rel.id}" d="${pathD}" class="${edgeClasses}" data-rel-id="${rel.id}" marker-end="${marker}"/>
+                <path id="path-${rel.id}" d="${pathD}" class="${edgeClasses}" data-rel-id="${rel.id}" data-verification="${rel.verification}" marker-end="${marker}"/>
 
                 <!-- Animated Data Packet Pulse Traveling Along Conduit -->
                 ${!isDimmed ? `
@@ -712,16 +713,13 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
                     </circle>
                 ` : ''}
 
-                <!-- Edge Correlation Rule Badge with Confidence Pill -->
-                <g class="ev-edge-label-group" data-rel-id="${rel.id}" transform="translate(${cx}, ${cy})">
-                    <rect x="-44" y="-12" width="88" height="24" rx="6"
-                          fill="#060913" stroke="${isSelected ? 'var(--gold)' : (rel.verification === 'disputed' ? '#ff2d55' : 'rgba(56, 189, 248, 0.45)')}"
-                          stroke-width="${isSelected ? 1.6 : 1}" filter="url(#ev-shadow)"/>
-                    <text x="0" y="-1" text-anchor="middle" font-family="JetBrains Mono" font-size="8" font-weight="700" fill="${isSelected ? '#f3d47c' : '#38bdf8'}">
+                <!-- Edge Correlation Rule Badge (Clearance-Protected) -->
+                <g class="ev-edge-label-group ${isSelected ? 'ev-edge-label--selected' : ''}" data-rel-id="${rel.id}" data-default-stroke="${defaultBadgeStroke}" transform="translate(${cx}, ${cy})">
+                    <rect x="-28" y="-10" width="56" height="20" rx="5"
+                          fill="#060913" stroke="${isSelected ? 'var(--gold)' : defaultBadgeStroke}"
+                          stroke-width="${isSelected ? 1.8 : 1}" filter="url(#ev-shadow)"/>
+                    <text x="0" y="3.5" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" font-weight="700" fill="${isSelected ? '#f3d47c' : '#38bdf8'}">
                         ${rel.ruleId}
-                    </text>
-                    <text x="0" y="8" text-anchor="middle" font-family="JetBrains Mono" font-size="7.5" font-weight="600" fill="${rel.confidence >= 80 ? '#00e676' : (rel.confidence >= 50 ? '#f59e0b' : '#ff2d55')}">
-                        ● ${rel.confidence}% CONF.
                     </text>
                 </g>
             `;
@@ -754,9 +752,9 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
 
             const icon = STAGE_ICONS[evt.id] || "🛡️";
 
-            // Card dimensions: generous, readable, luxurious
-            const w = 210;
-            const h = 100;
+            // Card dimensions: 186 x 94 with clean clearance
+            const w = 186;
+            const h = 94;
             const nx = pos.x - w / 2;
             const ny = pos.y - h / 2;
 
@@ -764,61 +762,60 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
             const totalCount = evt.requiredEvidence.length;
 
             html += `
-                <g class="${nodeClasses}" data-node-id="${evt.id}" transform="translate(${nx}, ${ny})">
+                <g class="${nodeClasses}" data-node-id="${evt.id}" data-status-color="${statusColor}" transform="translate(${nx}, ${ny})">
                     <!-- Drop Shadow / Radiant Neon Glow Behind Selected Node -->
-                    ${isSelected ? `
-                        <rect x="-4" y="-4" width="${w + 8}" height="${h + 8}" rx="14"
-                              fill="none" stroke="${statusColor}" stroke-width="1.8" filter="url(#ev-glow)" opacity="0.85"/>
-                    ` : ''}
+                    <rect class="ev-node-glow" x="-4" y="-4" width="${w + 8}" height="${h + 8}" rx="14"
+                          fill="none" stroke="${statusColor}" stroke-width="2" filter="url(#ev-glow)" opacity="0.85"
+                          style="display: ${isSelected ? 'block' : 'none'};"/>
 
                     <!-- Main Card Body -->
                     <rect class="ev-node-box" width="${w}" height="${h}" rx="10"
                           fill="${isSelected ? 'url(#ev-node-grad-active)' : 'url(#ev-node-grad)'}"
-                          stroke="${isSelected ? '#f3d47c' : statusColor}" stroke-width="${isSelected ? 2.2 : 1.2}"
+                          stroke="${isSelected ? '#f3d47c' : statusColor}" stroke-width="${isSelected ? 2.4 : 1.2}"
                           filter="url(#ev-shadow)"/>
 
                     <!-- Top Glow Accent Bar -->
                     <rect x="0" y="0" width="${w}" height="4" rx="2" fill="${statusColor}" />
 
                     <!-- Tactical Stage Icon + Event ID -->
-                    <circle cx="18" cy="19" r="8.5" fill="rgba(0,0,0,0.6)" stroke="${statusColor}55" stroke-width="1"/>
-                    <text x="18" y="22.5" text-anchor="middle" font-size="9">${icon}</text>
+                    <circle cx="16" cy="18" r="8" fill="rgba(0,0,0,0.6)" stroke="${statusColor}55" stroke-width="1"/>
+                    <text x="16" y="21.5" text-anchor="middle" font-size="8.5">${icon}</text>
 
-                    <text x="32" y="22" font-family="JetBrains Mono" font-size="10.5" font-weight="700" fill="${statusColor}">
+                    <text x="29" y="21" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="${statusColor}">
                         ${evt.id}
                     </text>
 
                     <!-- MITRE Tag with Cyan Glow -->
-                    <rect x="${w - 74}" y="10" width="66" height="15" rx="4"
+                    <rect x="${w - 68}" y="9" width="60" height="15" rx="4"
                           fill="rgba(6, 182, 212, 0.12)" stroke="rgba(56, 189, 248, 0.45)" stroke-width="0.9"/>
-                    <text x="${w - 41}" y="20.5" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" font-weight="600" fill="#38bdf8">
+                    <text x="${w - 38}" y="19.5" text-anchor="middle" font-family="JetBrains Mono" font-size="8" font-weight="600" fill="#38bdf8">
                         ${evt.mitre}
                     </text>
 
                     <!-- Event Title (Clean, Crisp Typography) -->
-                    <text x="10" y="42" font-family="Inter" font-size="11" font-weight="700" fill="#ffffff">
-                        ${evt.title.length > 25 ? evt.title.substring(0, 23) + '…' : evt.title}
+                    <text x="10" y="39" font-family="Inter" font-size="10.5" font-weight="700" fill="#ffffff">
+                        ${evt.title.length > 23 ? evt.title.substring(0, 21) + '…' : evt.title}
                     </text>
 
                     <!-- Host Machine Chip -->
-                    <rect x="10" y="52" width="${w - 20}" height="17" rx="3"
+                    <rect x="10" y="48" width="${w - 20}" height="16" rx="3"
                           fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.06)" stroke-width="0.7"/>
-                    <text x="16" y="64" font-family="JetBrains Mono" font-size="8.5" fill="#94a3b8">
+                    <text x="14" y="59.5" font-family="JetBrains Mono" font-size="8" fill="#94a3b8">
                         🖥️ ${evt.asset.split('.')[0]} • <tspan fill="#64748b">${evt.telemetry.split(' ')[0]}</tspan>
                     </text>
 
                     <!-- Bottom Status Strip -->
-                    <rect x="10" y="75" width="86" height="16" rx="8"
+                    <rect x="10" y="70" width="80" height="15" rx="7.5"
                           fill="rgba(0,0,0,0.65)" stroke="${statusColor}66" stroke-width="0.9"/>
-                    <circle cx="20" cy="83" r="3.5" fill="${statusColor}" filter="url(#ev-glow)"/>
-                    <text x="28" y="86" font-family="JetBrains Mono" font-size="8" font-weight="700" fill="#ffffff" text-transform="uppercase">
+                    <circle cx="18" cy="77.5" r="3" fill="${statusColor}" filter="url(#ev-glow)"/>
+                    <text x="25" y="80.5" font-family="JetBrains Mono" font-size="7.5" font-weight="700" fill="#ffffff" text-transform="uppercase">
                         ${evt.status}
                     </text>
 
                     <!-- Evidence Verified Metric Badge on Right -->
-                    <rect x="${w - 88}" y="75" width="78" height="16" rx="8"
+                    <rect x="${w - 82}" y="70" width="72" height="15" rx="7.5"
                           fill="rgba(0,0,0,0.45)" stroke="rgba(212,175,55,0.3)" stroke-width="0.7"/>
-                    <text x="${w - 49}" y="86" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="var(--gold-bright)">
+                    <text x="${w - 46}" y="80.5" text-anchor="middle" font-family="JetBrains Mono" font-size="7.5" fill="var(--gold-bright)">
                         ✓ ${verifiedCount}/${totalCount} Ev.
                     </text>
 
@@ -1140,35 +1137,172 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
     // 6. SVG INTERACTION (PAN, ZOOM, DRAG, CLICK)
     // ═══════════════════════════════════════════════════════════
 
+    function updateGraphTransform() {
+        const root = document.getElementById('ev-graph-root');
+        if (root) {
+            root.setAttribute('transform', `translate(${transform.x}, ${transform.y}) scale(${transform.k})`);
+        }
+    }
+
+    function updateGraphSelection() {
+        const svg = document.getElementById('ev-graph-svg');
+        if (!svg) return;
+
+        let activeNodes = null;
+        let activeEdges = null;
+
+        if (selectedEventId) {
+            const res = getConnectedEntities(selectedEventId);
+            activeNodes = res.connectedNodes;
+            activeEdges = res.connectedEdges;
+        } else if (selectedRelationshipId) {
+            const rel = investigation.relationships.find(r => r.id === selectedRelationshipId);
+            if (rel) {
+                activeNodes = new Set([rel.source, rel.target]);
+                activeEdges = new Set([rel.id]);
+            }
+        }
+
+        // Fast in-place node update without tearing down DOM
+        svg.querySelectorAll('.ev-node-group').forEach(node => {
+            const id = node.getAttribute('data-node-id');
+            const isSelected = selectedEventId === id;
+            const isHighlighted = activeNodes && activeNodes.has(id);
+            const isDimmed = activeNodes && !activeNodes.has(id);
+            const statusColor = node.getAttribute('data-status-color') || '#00e676';
+
+            node.classList.toggle('ev-node--selected', isSelected);
+            node.classList.toggle('ev-node--highlighted', isHighlighted);
+            node.classList.toggle('ev-node--dimmed', isDimmed);
+
+            const glow = node.querySelector('.ev-node-glow');
+            if (glow) {
+                glow.style.display = isSelected ? 'block' : 'none';
+            }
+
+            const box = node.querySelector('.ev-node-box');
+            if (box) {
+                box.setAttribute('fill', isSelected ? 'url(#ev-node-grad-active)' : 'url(#ev-node-grad)');
+                box.setAttribute('stroke', isSelected ? '#f3d47c' : statusColor);
+                box.setAttribute('stroke-width', isSelected ? '2.4' : '1.2');
+            }
+        });
+
+        // Fast in-place edge update without tearing down DOM
+        svg.querySelectorAll('.ev-edge-path').forEach(edge => {
+            const id = edge.getAttribute('data-rel-id');
+            const isSelected = selectedRelationshipId === id;
+            const isHighlighted = activeEdges && activeEdges.has(id);
+            const isDimmed = activeEdges && !activeEdges.has(id);
+
+            edge.classList.toggle('ev-edge--selected', isSelected);
+            edge.classList.toggle('ev-edge--highlighted', isHighlighted);
+            edge.classList.toggle('ev-edge--dimmed', isDimmed);
+
+            let marker = "url(#ev-arrow)";
+            if (isSelected) marker = "url(#ev-arrow-gold)";
+            if (edge.getAttribute('data-verification') === 'disputed') marker = "url(#ev-arrow-disputed)";
+            edge.setAttribute('marker-end', marker);
+        });
+
+        // Fast in-place edge label update without tearing down DOM
+        svg.querySelectorAll('.ev-edge-label-group').forEach(badge => {
+            const id = badge.getAttribute('data-rel-id');
+            const isSelected = selectedRelationshipId === id;
+            badge.classList.toggle('ev-edge-label--selected', isSelected);
+
+            const rect = badge.querySelector('rect');
+            if (rect) {
+                const defaultStroke = badge.getAttribute('data-default-stroke') || 'rgba(56, 189, 248, 0.45)';
+                rect.setAttribute('stroke', isSelected ? 'var(--gold)' : defaultStroke);
+                rect.setAttribute('stroke-width', isSelected ? '1.8' : '1');
+            }
+            const txt = badge.querySelector('text');
+            if (txt) {
+                txt.setAttribute('fill', isSelected ? '#f3d47c' : '#38bdf8');
+            }
+        });
+    }
+
+    function selectEvent(nodeId) {
+        if (!nodeId) return;
+        selectedEventId = nodeId;
+        selectedRelationshipId = null;
+        activeInspectorTab = "event";
+        updateInspectorTabs();
+        updateGraphSelection();
+        renderInspector();
+    }
+
+    function selectRelationship(relId) {
+        if (!relId) return;
+        selectedRelationshipId = relId;
+        selectedEventId = null;
+        activeInspectorTab = "evidence";
+        updateInspectorTabs();
+        updateGraphSelection();
+        renderInspector();
+    }
+
     function bindSvgEvents() {
         const svg = document.getElementById('ev-graph-svg');
         if (!svg) return;
 
-        // Node click
+        // Node click & tap interaction with distance threshold to prevent drag conflicts
         svg.querySelectorAll('.ev-node-group').forEach(node => {
+            const nodeId = node.getAttribute('data-node-id');
+            if (!nodeId) return;
+
+            let downX = 0, downY = 0;
+
+            node.addEventListener('pointerdown', (e) => {
+                downX = e.clientX;
+                downY = e.clientY;
+                e.stopPropagation();
+            });
+
+            node.addEventListener('pointerup', (e) => {
+                const dist = Math.hypot(e.clientX - downX, e.clientY - downY);
+                if (dist < 8) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    selectEvent(nodeId);
+                }
+            });
+
             node.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const nodeId = node.getAttribute('data-node-id');
-                selectedEventId = nodeId;
-                selectedRelationshipId = null;
-                activeInspectorTab = "event";
-                updateInspectorTabs();
-                renderGraph();
-                renderInspector();
+                e.preventDefault();
+                selectEvent(nodeId);
             });
         });
 
-        // Edge / relationship click
+        // Edge / relationship click & tap
         svg.querySelectorAll('.ev-edge-path, .ev-edge-label-group').forEach(elem => {
+            const relId = elem.getAttribute('data-rel-id');
+            if (!relId) return;
+
+            let downX = 0, downY = 0;
+
+            elem.addEventListener('pointerdown', (e) => {
+                downX = e.clientX;
+                downY = e.clientY;
+                e.stopPropagation();
+            });
+
+            elem.addEventListener('pointerup', (e) => {
+                const dist = Math.hypot(e.clientX - downX, e.clientY - downY);
+                if (dist < 8) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    selectRelationship(relId);
+                }
+            });
+
             elem.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const relId = elem.getAttribute('data-rel-id');
-                selectedRelationshipId = relId;
-                selectedEventId = null;
-                activeInspectorTab = "evidence";
-                updateInspectorTabs();
-                renderGraph();
-                renderInspector();
+                e.preventDefault();
+                selectRelationship(relId);
             });
         });
     }
@@ -1177,29 +1311,75 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
         const viewport = document.getElementById('ev-graph-viewport');
         if (!viewport) return;
 
-        viewport.addEventListener('mousedown', (e) => {
+        let isTracking = false;
+        let isDragging = false;
+        let startClientX = 0;
+        let startClientY = 0;
+        let currentPointerId = null;
+
+        viewport.addEventListener('pointerdown', (e) => {
+            // Only primary mouse button or single touch
+            if (e.button !== undefined && e.button !== 0) return;
+
+            // Never drag if starting on a node or edge
             if (e.target.closest('.ev-node-group') || e.target.closest('.ev-edge-path') || e.target.closest('.ev-edge-label-group')) {
                 return;
             }
-            isPanning = true;
+
+            isTracking = true;
+            isDragging = false;
+            startClientX = e.clientX;
+            startClientY = e.clientY;
+            currentPointerId = e.pointerId;
             panStart = { x: e.clientX - transform.x, y: e.clientY - transform.y };
         });
 
-        window.addEventListener('mousemove', (e) => {
-            if (!isPanning) return;
+        viewport.addEventListener('pointermove', (e) => {
+            if (!isTracking) return;
+
+            const dist = Math.hypot(e.clientX - startClientX, e.clientY - startClientY);
+
+            // Intentional movement threshold of 10px required before initiating pan!
+            // Any tap, touch, or finger micro-jitter < 10px will NEVER move the graph!
+            if (!isDragging) {
+                if (dist > 10) {
+                    isDragging = true;
+                    viewport.classList.add('is-dragging');
+                    if (viewport.setPointerCapture && currentPointerId !== null) {
+                        try { viewport.setPointerCapture(currentPointerId); } catch (_) {}
+                    }
+                } else {
+                    return; // Ignore micro-movement entirely
+                }
+            }
+
             transform.x = e.clientX - panStart.x;
             transform.y = e.clientY - panStart.y;
-            renderGraph();
+            updateGraphTransform();
         });
 
-        window.addEventListener('mouseup', () => { isPanning = false; });
+        const stopDragging = (e) => {
+            if (isTracking || isDragging) {
+                isTracking = false;
+                isDragging = false;
+                viewport.classList.remove('is-dragging');
+                if (currentPointerId !== null && viewport.releasePointerCapture) {
+                    try { viewport.releasePointerCapture(currentPointerId); } catch (_) {}
+                    currentPointerId = null;
+                }
+            }
+        };
 
-        // Wheel zoom
+        viewport.addEventListener('pointerup', stopDragging);
+        viewport.addEventListener('pointercancel', stopDragging);
+        window.addEventListener('pointerup', stopDragging);
+
+        // Wheel zoom (smooth update without tearing down DOM)
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const delta = e.deltaY < 0 ? 1.1 : 0.9;
+            const delta = e.deltaY < 0 ? 1.08 : 0.92;
             transform.k = Math.max(0.4, Math.min(2.5, transform.k * delta));
-            renderGraph();
+            updateGraphTransform();
         }, { passive: false });
 
         // Zoom buttons
@@ -1207,26 +1387,21 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
         const btnZoomOut = document.getElementById('ev-zoom-out');
         const btnReset = document.getElementById('ev-zoom-reset');
 
-        if (btnZoomIn) btnZoomIn.addEventListener('click', () => {
+        if (btnZoomIn) btnZoomIn.addEventListener('click', (e) => {
+            e.stopPropagation();
             transform.k = Math.min(2.5, transform.k * 1.15);
-            renderGraph();
+            updateGraphTransform();
         });
-        if (btnZoomOut) btnZoomOut.addEventListener('click', () => {
+        if (btnZoomOut) btnZoomOut.addEventListener('click', (e) => {
+            e.stopPropagation();
             transform.k = Math.max(0.4, transform.k * 0.85);
-            renderGraph();
+            updateGraphTransform();
         });
-        if (btnReset) btnReset.addEventListener('click', () => {
-            transform = { x: 40, y: 30, k: 1 };
-            selectedEventId = "EVT-104";
-            selectedRelationshipId = null;
-            searchQuery = "";
-            statusFilter = "all";
-            const searchInput = document.getElementById('ev-search-input');
-            const filterSelect = document.getElementById('ev-status-filter');
-            if (searchInput) searchInput.value = "";
-            if (filterSelect) filterSelect.value = "all";
-            renderGraph();
-            renderInspector();
+        if (btnReset) btnReset.addEventListener('click', (e) => {
+            e.stopPropagation();
+            transform = { x: 20, y: 15, k: 0.96 };
+            updateGraphTransform();
+            selectEvent("EVT-104");
         });
     }
 
@@ -1372,8 +1547,11 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
         if (middle) middle.style.display = 'none';
         if (recent) recent.style.display = 'none';
         if (evSection) {
+            const wasAlreadyActive = evSection.classList.contains('ev-view--active');
             evSection.classList.add('ev-view--active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (!wasAlreadyActive) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
 
         // Update active sidebar nav
@@ -1529,8 +1707,8 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
     window.EvidenceChainEngine = {
         getInvestigation: () => investigation,
         reevaluate: reevaluateEvidenceChain,
-        selectEvent: (id) => { selectedEventId = id; renderGraph(); renderInspector(); },
-        selectRelationship: (id) => { selectedRelationshipId = id; renderGraph(); renderInspector(); },
+        selectEvent: (id) => selectEvent(id),
+        selectRelationship: (id) => selectRelationship(id),
         exportJson: generateJsonExport,
         exportMd: generateMarkdownExport,
         switchToEvidenceChainView,
