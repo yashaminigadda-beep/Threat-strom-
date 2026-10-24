@@ -31,6 +31,21 @@ const server = http.createServer((req, res) => {
         return;
     }
 
+    // ── Safe Route for Sign In / Auth Portal ──
+    if (['/auth', '/login', '/signin'].includes(urlPath)) {
+        let filePath = path.join(__dirname, 'index.html');
+        fs.readFile(filePath, (err, content) => {
+            if (err) {
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end(`Server Error: ${err.code}`);
+            } else {
+                res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+                res.end(content);
+            }
+        });
+        return;
+    }
+
     // ── Static Asset Serving (Original Untouched Behavior) ──
     let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : urlPath);
     

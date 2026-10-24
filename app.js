@@ -1090,29 +1090,30 @@
         allSectionIds.forEach(id => {
             const el = document.getElementById(id);
             if (el) {
+                el.style.display = 'none';
                 if (id === 'evidence-chain') {
                     el.classList.remove('ev-view--active');
-                } else {
-                    el.style.display = 'none';
                 }
             }
         });
 
         // Show requested view sections
         if (viewName === 'evidence-chain') {
-            if (window.EvidenceChainEngine && window.EvidenceChainEngine.switchToEvidenceChainView) {
-                window.EvidenceChainEngine.switchToEvidenceChainView();
-            } else {
-                const evEl = document.getElementById('evidence-chain');
-                if (evEl) evEl.classList.add('ev-view--active');
+            const evEl = document.getElementById('evidence-chain');
+            if (evEl) {
+                evEl.style.display = '';
+                evEl.classList.add('ev-view--active');
             }
+            window.scrollTo({ top: 0, behavior: 'instant' });
         } else {
             const targetIds = VIEW_SECTIONS[viewName] || VIEW_SECTIONS.planetary;
             targetIds.forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.style.display = '';
+                if (el) {
+                    el.style.display = (id === 'view-auth' || id.startsWith('view-')) ? 'flex' : '';
+                }
             });
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'instant' });
         }
 
         // Synchronize Top Tab Pills
@@ -1123,7 +1124,8 @@
             feed: 'tab-feed',
             sector: 'tab-sector',
             reports: 'tab-reports',
-            settings: 'tab-settings'
+            settings: 'tab-settings',
+            auth: 'tab-auth'
         };
         const activeTabId = tabMapping[viewName];
         if (activeTabId) {
@@ -1140,7 +1142,8 @@
             sector: 'menu-sector',
             alerts: 'menu-alerts',
             reports: 'menu-reports',
-            settings: 'menu-settings'
+            settings: 'menu-settings',
+            auth: 'menu-auth'
         };
         const activeMenuId = menuMapping[viewName];
         if (activeMenuId) {
@@ -1558,6 +1561,7 @@
         const tabSector = document.getElementById('tab-sector');
         const tabReports = document.getElementById('tab-reports');
         const tabSettings = document.getElementById('tab-settings');
+        const tabAuth = document.getElementById('tab-auth');
 
         if (tabPlanetary) tabPlanetary.addEventListener('click', () => switchAppView('planetary'));
         if (tabEvidence) tabEvidence.addEventListener('click', () => switchAppView('evidence-chain'));
@@ -1565,6 +1569,7 @@
         if (tabSector) tabSector.addEventListener('click', () => switchAppView('sector'));
         if (tabReports) tabReports.addEventListener('click', () => switchAppView('reports'));
         if (tabSettings) tabSettings.addEventListener('click', () => switchAppView('settings'));
+        if (tabAuth) tabAuth.addEventListener('click', () => switchAppView('auth'));
 
         // ── Sidebar Menu Links ──
         const menuThreatMap = document.getElementById('menu-threat-map');
@@ -1574,6 +1579,7 @@
         const menuAlerts = document.getElementById('menu-alerts');
         const menuReports = document.getElementById('menu-reports');
         const menuSettings = document.getElementById('menu-settings');
+        const menuAuth = document.getElementById('menu-auth');
 
         if (menuThreatMap) menuThreatMap.addEventListener('click', (e) => { e.preventDefault(); switchAppView('planetary'); });
         if (menuEvidence) menuEvidence.addEventListener('click', (e) => { e.preventDefault(); switchAppView('evidence-chain'); });
@@ -1582,6 +1588,7 @@
         if (menuAlerts) menuAlerts.addEventListener('click', (e) => { e.preventDefault(); switchAppView('alerts'); });
         if (menuReports) menuReports.addEventListener('click', (e) => { e.preventDefault(); switchAppView('reports'); });
         if (menuSettings) menuSettings.addEventListener('click', (e) => { e.preventDefault(); switchAppView('settings'); });
+        if (menuAuth) menuAuth.addEventListener('click', (e) => { e.preventDefault(); switchAppView('auth'); });
 
         // ── View All Buttons ──
         if (DOM.btnViewAllAlerts) {
@@ -2113,6 +2120,16 @@
             });
         }
 
+        // Dropdown Menu: Switch Analyst / Auth Portal
+        const btnMenuSwitchAuth = document.getElementById('btn-menu-switch-auth');
+        if (btnMenuSwitchAuth) {
+            btnMenuSwitchAuth.addEventListener('click', () => {
+                if (dropdown) dropdown.classList.remove('is-open');
+                if (profileBadge) profileBadge.classList.remove('menu-open');
+                switchAppView('auth');
+            });
+        }
+
         // Dropdown Menu: Sign Out
         if (btnSignOut) {
             btnSignOut.addEventListener('click', async () => {
@@ -2173,8 +2190,18 @@
     }
 
     // ═══════════════════════════════════════════════════════════
-    // BOOTSTRAP
+    // BOOTSTRAP & ROUTING
     // ═══════════════════════════════════════════════════════════
+
+    function checkInitialRoute() {
+        const path = window.location.pathname.toLowerCase();
+        const hash = window.location.hash.toLowerCase();
+        if (['/auth', '/login', '/signin'].includes(path) || ['#auth', '#login', '#signin', '#view-auth'].includes(hash)) {
+            switchAppView('auth');
+        } else if (hash === '#evidence-chain') {
+            switchAppView('evidence-chain');
+        }
+    }
 
     function init() {
         startLiveUtcClock();
@@ -2184,6 +2211,8 @@
         initThreatDonut();
         initGoldTouchRipple();
         bindEvents();
+        checkInitialRoute();
+        window.addEventListener('hashchange', checkInitialRoute);
     }
 
     if (document.readyState === 'loading') {
