@@ -2073,6 +2073,21 @@
             });
         }
 
+        const portalBtnGoogle = document.getElementById('portal-btn-google');
+        const btnModalGoogle = document.getElementById('btn-auth-google');
+
+        async function handleGoogleLogin() {
+            showToast('⚡ Redirecting to Google Authentication...');
+            const res = await window.ThreatStormSupabase.signInWithOAuth('google');
+            if (!res.success) {
+                showPortalFeedback(`✕ Google OAuth error: ${res.message}`, 'error');
+                showToast(`✕ Google login error: ${res.message}`);
+            }
+        }
+
+        if (portalBtnGoogle) portalBtnGoogle.addEventListener('click', handleGoogleLogin);
+        if (btnModalGoogle) btnModalGoogle.addEventListener('click', handleGoogleLogin);
+
         // Profile Badge & Dropdown
         if (profileBadge && dropdown) {
             profileBadge.addEventListener('click', (e) => {
@@ -2107,8 +2122,13 @@
             });
         }
 
-        // Initialize state on load
+        // Initialize state on load & sync Supabase Auth (e.g. after Google redirect)
         updateAuthUI();
+        if (window.ThreatStormSupabase && window.ThreatStormSupabase.syncAuthSession) {
+            window.ThreatStormSupabase.syncAuthSession().then(user => {
+                if (user) updateAuthUI();
+            });
+        }
     }
 
     // ═══════════════════════════════════════════════════════════

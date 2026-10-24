@@ -3513,6 +3513,47 @@ button:active,
     font-family: var(--font-mono);
 }
 
+/* Google OAuth Action Button */
+.portal-btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 11px 18px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-sm);
+    color: #0f172a;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), 0 0 16px rgba(255, 255, 255, 0.15);
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+}
+
+.portal-btn-google:hover {
+    background: #f8fafc;
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.35);
+    transform: translateY(-1px);
+}
+
+.google-badge-verified {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    color: #16a34a;
+    background: rgba(22, 163, 74, 0.12);
+    border: 1px solid rgba(22, 163, 74, 0.35);
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+}
+
+
 
 
 

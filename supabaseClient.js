@@ -338,6 +338,51 @@
         return demoUser;
     }
 
+    async function signInWithOAuth(provider = 'google') {
+        const client = getClient();
+        if (!client) {
+            return { success: false, message: 'Supabase client is not connected.' };
+        }
+
+        try {
+            const { data, error } = await client.auth.signInWithOAuth({
+                provider: provider,
+                options: {
+                    redirectTo: window.location.origin
+                }
+            });
+
+            if (error) throw error;
+            return { success: true, data };
+        } catch (err) {
+            return { success: false, message: err.message };
+        }
+    }
+
+    async function syncAuthSession() {
+        const client = getClient();
+        if (!client) return getCurrentUser();
+
+        try {
+            const { data: { session } } = await client.auth.getSession();
+            if (session && session.user) {
+                const user = {
+                    id: session.user.id,
+                    email: session.user.email,
+                    callsign: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email.split('@')[0].toUpperCase(),
+                    role: 'SOC Incident Responder (Google Authenticated)',
+                    clearance: 'TOP SECRET // LEVEL 4',
+                    avatarUrl: session.user.user_metadata?.avatar_url || ''
+                };
+                localStorage.setItem(STORAGE_KEY_AUTH_USER, JSON.stringify(user));
+                return user;
+            }
+        } catch (e) {
+            console.warn('[Supabase Auth] Session sync exception:', e);
+        }
+        return getCurrentUser();
+    }
+
     // Expose API globally
     window.ThreatStormSupabase = {
         getConfig,
@@ -349,6 +394,8 @@
         saveEvidenceChain,
         signIn,
         signUp,
+        signInWithOAuth,
+        syncAuthSession,
         signOut,
         getCurrentUser,
         loginDemoAnalyst,
