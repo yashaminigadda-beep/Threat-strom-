@@ -223,6 +223,121 @@
         }
     }
 
+    // ═══════════════════════════════════════════════════════════
+    // SUPABASE AUTHENTICATION ENGINE
+    // ═══════════════════════════════════════════════════════════
+
+    const STORAGE_KEY_AUTH_USER = 'threatstorm_auth_user';
+
+    async function signIn(email, password) {
+        const client = getClient();
+        if (!client) {
+            return { success: false, message: 'Supabase client is not connected.' };
+        }
+
+        try {
+            const { data, error } = await client.auth.signInWithPassword({
+                email: email.trim(),
+                password: password
+            });
+
+            if (error) {
+                return { success: false, message: error.message };
+            }
+
+            const user = {
+                id: data.user.id,
+                email: data.user.email,
+                callsign: data.user.user_metadata?.callsign || data.user.email.split('@')[0].toUpperCase(),
+                role: 'SOC Incident Responder',
+                clearance: 'TOP SECRET // LEVEL 4'
+            };
+
+            localStorage.setItem(STORAGE_KEY_AUTH_USER, JSON.stringify(user));
+            return { success: true, user, message: 'Authentication successful.' };
+        } catch (err) {
+            return { success: false, message: err.message };
+        }
+    }
+
+    async function signUp(email, password, callsign) {
+        const client = getClient();
+        if (!client) {
+            return { success: false, message: 'Supabase client is not connected.' };
+        }
+
+        try {
+            const { data, error } = await client.auth.signUp({
+                email: email.trim(),
+                password: password,
+                options: {
+                    data: {
+                        callsign: callsign || email.split('@')[0].toUpperCase()
+                    }
+                }
+            });
+
+            if (error) {
+                return { success: false, message: error.message };
+            }
+
+            if (data.user && !data.session) {
+                return {
+                    success: true,
+                    confirmationRequired: true,
+                    message: 'Verification link sent! Check your email to confirm registration.'
+                };
+            }
+
+            const user = {
+                id: data.user ? data.user.id : 'user-' + Date.now(),
+                email: email,
+                callsign: callsign || email.split('@')[0].toUpperCase(),
+                role: 'SOC Junior Analyst',
+                clearance: 'SECRET // LEVEL 2'
+            };
+
+            localStorage.setItem(STORAGE_KEY_AUTH_USER, JSON.stringify(user));
+            return { success: true, user, message: 'Account registered and authenticated.' };
+        } catch (err) {
+            return { success: false, message: err.message };
+        }
+    }
+
+    async function signOut() {
+        const client = getClient();
+        if (client) {
+            try {
+                await client.auth.signOut();
+            } catch (e) {
+                console.warn('[Supabase Auth] Sign out exception:', e);
+            }
+        }
+        localStorage.removeItem(STORAGE_KEY_AUTH_USER);
+        return { success: true };
+    }
+
+    function getCurrentUser() {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY_AUTH_USER);
+            if (stored) return JSON.parse(stored);
+        } catch (e) {}
+        return null;
+    }
+
+    function loginDemoAnalyst() {
+        const demoUser = {
+            id: 'demo-analyst-yk',
+            email: 'commander.yash@threatstorm.defense',
+            callsign: 'Commander Yash K.',
+            role: 'Lead Cyber Operations Commander',
+            clearance: 'TOP SECRET // HAUTE LEVEL 5',
+            isDemo: true
+        };
+        localStorage.setItem(STORAGE_KEY_AUTH_USER, JSON.stringify(demoUser));
+        return demoUser;
+    }
+
     // Expose API globally
     window.ThreatStormSupabase = {
         getConfig,
@@ -232,6 +347,11 @@
         syncLocalThreatsToCloud,
         fetchThreatsFromCloud,
         saveEvidenceChain,
+        signIn,
+        signUp,
+        signOut,
+        getCurrentUser,
+        loginDemoAnalyst,
         isConnected: () => !!getClient()
     };
 })();

@@ -1629,6 +1629,7 @@
 
         // ── Supabase Cloud Integration Handlers ──
         initSupabaseUI();
+        initAuthSystem();
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -1787,6 +1788,211 @@
                 showToast('✓ Disconnected. Running in Local In-Memory Mode.');
             });
         }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // CYBER SOC AUTHENTICATION & SESSION ENGINE
+    // ═══════════════════════════════════════════════════════════
+
+    function initAuthSystem() {
+        const btnOpenAuth = document.getElementById('btn-open-auth');
+        const authModal = document.getElementById('auth-modal');
+        const btnCloseAuth = document.getElementById('auth-modal-close');
+        const tabSignIn = document.getElementById('tab-auth-signin');
+        const tabSignUp = document.getElementById('tab-auth-signup');
+        const groupCallsign = document.getElementById('group-auth-callsign');
+        const inputCallsign = document.getElementById('auth-input-callsign');
+        const inputEmail = document.getElementById('auth-input-email');
+        const inputPassword = document.getElementById('auth-input-password');
+        const btnTogglePass = document.getElementById('btn-toggle-password');
+        const btnSubmit = document.getElementById('btn-auth-submit');
+        const submitLabel = document.getElementById('auth-submit-label');
+        const btnDemo = document.getElementById('btn-auth-demo');
+        const feedback = document.getElementById('auth-feedback-box');
+
+        const profileBadge = document.getElementById('user-profile-badge');
+        const navAvatar = document.getElementById('nav-user-avatar');
+        const navInitials = document.getElementById('nav-user-initials');
+        const navCallsign = document.getElementById('nav-user-callsign');
+        const navClearance = document.getElementById('nav-user-clearance');
+        const dropdown = document.getElementById('user-menu-dropdown');
+        const dropdownEmail = document.getElementById('dropdown-user-email');
+        const dropdownRole = document.getElementById('dropdown-user-role');
+        const btnMenuSettings = document.getElementById('btn-menu-settings');
+        const btnSignOut = document.getElementById('btn-auth-signout');
+
+        let authMode = 'signin'; // 'signin' or 'signup'
+
+        function showAuthFeedback(msg, type) {
+            if (!feedback) return;
+            feedback.style.display = 'block';
+            feedback.style.background = type === 'error' ? 'rgba(239, 68, 68, 0.12)' : (type === 'warn' ? 'rgba(212, 175, 55, 0.12)' : 'rgba(62, 207, 142, 0.12)');
+            feedback.style.border = `1px solid ${type === 'error' ? '#ef4444' : (type === 'warn' ? '#d4af37' : '#3ECF8E')}`;
+            feedback.style.color = type === 'error' ? '#fca5a5' : (type === 'warn' ? '#fde047' : '#86efac');
+            feedback.innerHTML = msg;
+        }
+
+        function updateAuthUI() {
+            if (!window.ThreatStormSupabase) return;
+            const currentUser = window.ThreatStormSupabase.getCurrentUser();
+
+            if (currentUser) {
+                if (btnOpenAuth) btnOpenAuth.style.display = 'none';
+                if (profileBadge) profileBadge.style.display = 'inline-flex';
+
+                const name = currentUser.callsign || currentUser.email || 'Analyst';
+                const initials = name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'AN';
+
+                if (navInitials) navInitials.textContent = initials;
+                if (navCallsign) navCallsign.textContent = name;
+                if (navClearance) navClearance.textContent = currentUser.clearance || 'SECRET // LEVEL 3';
+                if (dropdownEmail) dropdownEmail.textContent = currentUser.email || 'analyst@threatstorm.defense';
+                if (dropdownRole) dropdownRole.textContent = currentUser.role || 'SOC Cyber Analyst';
+            } else {
+                if (btnOpenAuth) btnOpenAuth.style.display = 'inline-flex';
+                if (profileBadge) profileBadge.style.display = 'none';
+                if (dropdown) dropdown.classList.remove('is-open');
+                if (profileBadge) profileBadge.classList.remove('menu-open');
+            }
+        }
+
+        // Open Modal
+        if (btnOpenAuth && authModal) {
+            btnOpenAuth.addEventListener('click', () => {
+                authModal.style.display = 'flex';
+                if (feedback) feedback.style.display = 'none';
+                setTimeout(() => { if (inputEmail) inputEmail.focus(); }, 100);
+            });
+        }
+
+        // Close Modal
+        function closeAuthModal() {
+            if (authModal) authModal.style.display = 'none';
+        }
+
+        if (btnCloseAuth) btnCloseAuth.addEventListener('click', closeAuthModal);
+        if (authModal) {
+            authModal.addEventListener('click', (e) => {
+                if (e.target === authModal) closeAuthModal();
+            });
+        }
+
+        // Tabs
+        if (tabSignIn && tabSignUp) {
+            tabSignIn.addEventListener('click', () => {
+                authMode = 'signin';
+                tabSignIn.classList.add('auth-tab--active');
+                tabSignUp.classList.remove('auth-tab--active');
+                if (groupCallsign) groupCallsign.style.display = 'none';
+                if (submitLabel) submitLabel.textContent = '⚡ Sign In to SOC Portal';
+                if (feedback) feedback.style.display = 'none';
+            });
+
+            tabSignUp.addEventListener('click', () => {
+                authMode = 'signup';
+                tabSignUp.classList.add('auth-tab--active');
+                tabSignIn.classList.remove('auth-tab--active');
+                if (groupCallsign) groupCallsign.style.display = 'block';
+                if (submitLabel) submitLabel.textContent = '🛡️ Create SOC Account';
+                if (feedback) feedback.style.display = 'none';
+            });
+        }
+
+        // Password Show/Hide
+        if (btnTogglePass && inputPassword) {
+            btnTogglePass.addEventListener('click', () => {
+                const isPass = inputPassword.type === 'password';
+                inputPassword.type = isPass ? 'text' : 'password';
+                btnTogglePass.textContent = isPass ? 'Hide' : 'Show';
+            });
+        }
+
+        // Form Submit
+        if (btnSubmit) {
+            btnSubmit.addEventListener('click', async () => {
+                const email = inputEmail.value.trim();
+                const password = inputPassword.value;
+                const callsign = inputCallsign ? inputCallsign.value.trim() : '';
+
+                if (!email || !password) {
+                    showAuthFeedback('⚠️ Please enter both work email and password.', 'warn');
+                    return;
+                }
+
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<span>⏳ Authenticating...</span>';
+
+                let result;
+                if (authMode === 'signup') {
+                    result = await window.ThreatStormSupabase.signUp(email, password, callsign);
+                } else {
+                    result = await window.ThreatStormSupabase.signIn(email, password);
+                }
+
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<span>${authMode === 'signup' ? '🛡️ Create SOC Account' : '⚡ Sign In to SOC Portal'}</span>`;
+
+                if (result.success) {
+                    if (result.confirmationRequired) {
+                        showAuthFeedback(`✓ ${result.message}`, 'warn');
+                        showToast('✉ Verification link sent to your email.');
+                    } else {
+                        updateAuthUI();
+                        closeAuthModal();
+                        showToast(`✓ Welcome, ${result.user.callsign}! Access Clearance Verified.`);
+                    }
+                } else {
+                    showAuthFeedback(`✕ Authentication failed: ${result.message}`, 'error');
+                }
+            });
+        }
+
+        // Instant Demo Login
+        if (btnDemo) {
+            btnDemo.addEventListener('click', () => {
+                const demoUser = window.ThreatStormSupabase.loginDemoAnalyst();
+                updateAuthUI();
+                closeAuthModal();
+                showToast(`✓ Access Granted: ${demoUser.callsign} (${demoUser.clearance})`);
+            });
+        }
+
+        // Profile Badge & Dropdown
+        if (profileBadge && dropdown) {
+            profileBadge.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = dropdown.classList.toggle('is-open');
+                profileBadge.classList.toggle('menu-open', isOpen);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!profileBadge.contains(e.target)) {
+                    dropdown.classList.remove('is-open');
+                    profileBadge.classList.remove('menu-open');
+                }
+            });
+        }
+
+        // Dropdown Menu: Settings
+        if (btnMenuSettings) {
+            btnMenuSettings.addEventListener('click', () => {
+                if (dropdown) dropdown.classList.remove('is-open');
+                if (profileBadge) profileBadge.classList.remove('menu-open');
+                switchAppView('settings');
+            });
+        }
+
+        // Dropdown Menu: Sign Out
+        if (btnSignOut) {
+            btnSignOut.addEventListener('click', async () => {
+                await window.ThreatStormSupabase.signOut();
+                updateAuthUI();
+                showToast('✓ Signed out of SOC Terminal. Session terminated.');
+            });
+        }
+
+        // Initialize state on load
+        updateAuthUI();
     }
 
     // ═══════════════════════════════════════════════════════════
