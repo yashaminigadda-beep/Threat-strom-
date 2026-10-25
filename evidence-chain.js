@@ -1572,15 +1572,34 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
     }
 
     function switchToDashboardView(targetHash) {
+        const evSection = document.getElementById('evidence-chain');
+        if (evSection) evSection.classList.remove('ev-view--active');
+
+        // If global switchAppView exists, delegate view switching to prevent DOM collision
+        if (typeof window.switchAppView === 'function') {
+            if (targetHash === '#evidence-chain' || targetHash === '#evidencechain') {
+                window.switchAppView('evidence-chain');
+                return;
+            } else if (targetHash === '#auth' || targetHash === '#login' || targetHash === '#view-auth') {
+                window.switchAppView('auth');
+                return;
+            } else if (targetHash && targetHash.startsWith('#view-')) {
+                const viewName = targetHash.replace('#view-', '');
+                window.switchAppView(viewName);
+                return;
+            } else if (!targetHash || targetHash === '#' || targetHash === '#hero-section') {
+                window.switchAppView('planetary');
+                return;
+            }
+        }
+
         const hero = document.getElementById('hero-section');
         const middle = document.getElementById('middle-dashboard');
         const recent = document.getElementById('recent-threats-section');
-        const evSection = document.getElementById('evidence-chain');
 
         if (hero) hero.style.display = '';
         if (middle) middle.style.display = '';
         if (recent) recent.style.display = '';
-        if (evSection) evSection.classList.remove('ev-view--active');
 
         // Scroll to target element if present
         if (targetHash && targetHash !== '#' && targetHash !== '#hero-section') {
@@ -1593,6 +1612,10 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
         const hash = window.location.hash;
         if (hash === '#evidence-chain' || hash === '#evidencechain') {
             switchToEvidenceChainView();
+        } else if (typeof window.switchAppView === 'function') {
+            // Handled cooperatively by app.js router
+            const evSection = document.getElementById('evidence-chain');
+            if (evSection) evSection.classList.remove('ev-view--active');
         } else {
             switchToDashboardView(hash);
         }
@@ -1633,11 +1656,17 @@ Note: SIEM Cross-Check flagged script 'C:\\IT\\Scripts\\weekly_event_rotate.ps1'
             });
         }
 
-        // When user clicks other sidebar items, return to dashboard view smoothly
+        // When user clicks other sidebar items, return to target view smoothly
         document.querySelectorAll('.sidebar__nav .nav-item').forEach(item => {
             if (item.id !== 'menu-evidence-chain') {
                 item.addEventListener('click', () => {
                     const href = item.getAttribute('href');
+                    if (href && (href.startsWith('#view-') || href === '#auth' || href === '#login')) {
+                        // Handled directly by app.js router
+                        const evSection = document.getElementById('evidence-chain');
+                        if (evSection) evSection.classList.remove('ev-view--active');
+                        return;
+                    }
                     switchToDashboardView(href);
                     document.querySelectorAll('.sidebar__nav .nav-item').forEach(i => i.classList.remove('nav-item--active'));
                     item.classList.add('nav-item--active');

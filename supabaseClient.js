@@ -6,8 +6,8 @@
 (function () {
     const STORAGE_KEY_URL = 'threatstorm_sb_url';
     const STORAGE_KEY_KEY = 'threatstorm_sb_key';
-    const DEFAULT_URL = 'https://vlwdxlwmljigbxncxqdm.supabase.co';
-    const DEFAULT_KEY = 'sb_publishable_U0ECEE9mpLSQe4z8DwnVLA_fdU6vwnG';
+    const DEFAULT_URL = '';
+    const DEFAULT_KEY = '';
 
     let supabaseInstance = null;
     let isConnected = false;
@@ -21,7 +21,7 @@
     function getConfig() {
         const rawUrl = localStorage.getItem(STORAGE_KEY_URL) || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) || DEFAULT_URL;
         const key = localStorage.getItem(STORAGE_KEY_KEY) || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.key) || DEFAULT_KEY;
-        return { url: normalizeUrl(rawUrl), key: key.trim() };
+        return { url: normalizeUrl(rawUrl), key: (key || '').trim() };
     }
 
     // Initialize Supabase instance safely
@@ -228,6 +228,39 @@
     // ═══════════════════════════════════════════════════════════
 
     const STORAGE_KEY_AUTH_USER = 'threatstorm_auth_user';
+    const ADMIN_EMAIL = 'yaswanthkumaraminigadda@gmail.com';
+
+    function isUserAdmin(email) {
+        if (!email) return false;
+        return email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    }
+
+    function buildUserProfile(rawUser, metadata = {}) {
+        const email = (rawUser.email || '').trim();
+        const isAdmin = isUserAdmin(email);
+
+        if (isAdmin) {
+            return {
+                id: rawUser.id || 'admin-yaswanth-yk',
+                email: email,
+                callsign: metadata.callsign || metadata.full_name || metadata.name || 'Commander Yaswanth',
+                role: 'Lead SOC Administrator & Global Commander',
+                clearance: 'LEVEL 5 — GLOBAL SOC ADMIN',
+                isAdmin: true,
+                avatarUrl: metadata.avatar_url || ''
+            };
+        }
+
+        return {
+            id: rawUser.id || ('user-' + Date.now()),
+            email: email,
+            callsign: metadata.callsign || metadata.full_name || metadata.name || email.split('@')[0].toUpperCase(),
+            role: metadata.role || 'SOC Incident Responder',
+            clearance: metadata.clearance || 'TOP SECRET // LEVEL 4',
+            isAdmin: false,
+            avatarUrl: metadata.avatar_url || ''
+        };
+    }
 
     async function signIn(email, password) {
         const client = getClient();
@@ -242,17 +275,16 @@
             });
 
             if (error) {
-                return { success: false, message: error.message };
+                let msg = error.message;
+                if (error.message.includes('Email not confirmed')) {
+                    msg = 'Email not confirmed! Supabase lo email verification pending undhi. Please check your email inbox OR go to Supabase Dashboard → Authentication → Providers → Email → Turn OFF "Confirm email".';
+                } else if (error.message.includes('Invalid login credentials')) {
+                    msg = 'Invalid credentials. Password thappuga undhi or ee email tho inka sign up avvaledhu. First "Sign Up" tab click chesi register avvandi.';
+                }
+                return { success: false, message: msg };
             }
 
-            const user = {
-                id: data.user.id,
-                email: data.user.email,
-                callsign: data.user.user_metadata?.callsign || data.user.email.split('@')[0].toUpperCase(),
-                role: 'SOC Incident Responder',
-                clearance: 'TOP SECRET // LEVEL 4'
-            };
-
+            const user = buildUserProfile(data.user, data.user.user_metadata || {});
             localStorage.setItem(STORAGE_KEY_AUTH_USER, JSON.stringify(user));
             return { success: true, user, message: 'Authentication successful.' };
         } catch (err) {
@@ -285,18 +317,11 @@
                 return {
                     success: true,
                     confirmationRequired: true,
-                    message: 'Verification link sent! Check your email to confirm registration.'
+                    message: 'Verification link sent to ' + email + '! Mee email inbox lo link click cheyandi, or Supabase Dashboard lo "Confirm email" turn OFF cheyandi instant login kosam.'
                 };
             }
 
-            const user = {
-                id: data.user ? data.user.id : 'user-' + Date.now(),
-                email: email,
-                callsign: callsign || email.split('@')[0].toUpperCase(),
-                role: 'SOC Junior Analyst',
-                clearance: 'SECRET // LEVEL 2'
-            };
-
+            const user = buildUserProfile(data.user || { email }, { callsign });
             localStorage.setItem(STORAGE_KEY_AUTH_USER, JSON.stringify(user));
             return { success: true, user, message: 'Account registered and authenticated.' };
         } catch (err) {
@@ -326,36 +351,58 @@
     }
 
     function loginDemoAnalyst() {
-        const demoUser = {
-            id: 'demo-analyst-yk',
-            email: 'commander.yash@threatstorm.defense',
-            callsign: 'Commander Yash K.',
-            role: 'Lead Cyber Operations Commander',
-            clearance: 'TOP SECRET // HAUTE LEVEL 5',
-            isDemo: true
-        };
+        const demoUser = buildUserProfile({
+            id: 'admin-yaswanth-yk',
+            email: ADMIN_EMAIL
+        }, {
+            callsign: 'Commander Yaswanth'
+        });
         localStorage.setItem(STORAGE_KEY_AUTH_USER, JSON.stringify(demoUser));
         return demoUser;
     }
 
     async function signInWithOAuth(provider = 'google') {
+        const redirectUri = window.location.origin;
+        const currentCfg = getConfig();
+        const baseAuthUrl = currentCfg.url ? `${currentCfg.url}/auth/v1/authorize` : '';
+        const directGoogleOAuthUrl = baseAuthUrl ? `${baseAuthUrl}?provider=google&redirect_to=${encodeURIComponent(redirectUri)}&prompt=select_account` : '';
+
         const client = getClient();
-        if (!client) {
-            return { success: false, message: 'Supabase client is not connected.' };
+        if (!client && directGoogleOAuthUrl) {
+            console.log('[OAuth] Redirecting directly to Supabase Google authorize endpoint:', directGoogleOAuthUrl);
+            window.location.href = directGoogleOAuthUrl;
+            return { success: true };
         }
 
         try {
             const { data, error } = await client.auth.signInWithOAuth({
                 provider: provider,
                 options: {
-                    redirectTo: window.location.origin
+                    redirectTo: redirectUri,
+                    queryParams: {
+                        prompt: 'select_account'
+                    }
                 }
             });
 
-            if (error) throw error;
+            if (error) {
+                console.warn('[OAuth] signInWithOAuth returned error, redirecting directly:', error);
+                window.location.href = directGoogleOAuthUrl;
+                return { success: true };
+            }
+
+            if (data && data.url) {
+                console.log('[OAuth] Redirecting to Google OAuth URL:', data.url);
+                window.location.href = data.url;
+            } else {
+                console.log('[OAuth] Fallback redirecting to direct endpoint:', directGoogleOAuthUrl);
+                window.location.href = directGoogleOAuthUrl;
+            }
             return { success: true, data };
         } catch (err) {
-            return { success: false, message: err.message };
+            console.warn('[OAuth] Exception, redirecting directly:', err);
+            window.location.href = directGoogleOAuthUrl;
+            return { success: true };
         }
     }
 
@@ -366,21 +413,50 @@
         try {
             const { data: { session } } = await client.auth.getSession();
             if (session && session.user) {
-                const user = {
-                    id: session.user.id,
-                    email: session.user.email,
-                    callsign: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email.split('@')[0].toUpperCase(),
-                    role: 'SOC Incident Responder (Google Authenticated)',
-                    clearance: 'TOP SECRET // LEVEL 4',
-                    avatarUrl: session.user.user_metadata?.avatar_url || ''
-                };
+                const user = buildUserProfile(session.user, session.user.user_metadata || {});
                 localStorage.setItem(STORAGE_KEY_AUTH_USER, JSON.stringify(user));
+
+                // Clean hash if coming back from OAuth redirect
+                if (window.location.hash && window.location.hash.includes('access_token')) {
+                    try {
+                        window.history.replaceState(null, '', window.location.pathname);
+                    } catch (_) {}
+                }
+
                 return user;
             }
         } catch (e) {
             console.warn('[Supabase Auth] Session sync exception:', e);
         }
         return getCurrentUser();
+    }
+
+    function initAuthListener(onUserChange) {
+        const client = getClient();
+        if (!client) return;
+
+        client.auth.onAuthStateChange((event, session) => {
+            console.log('[Supabase Auth Event]', event, session?.user?.email);
+            if (session && session.user) {
+                const user = buildUserProfile(session.user, session.user.user_metadata || {});
+                localStorage.setItem(STORAGE_KEY_AUTH_USER, JSON.stringify(user));
+
+                if (window.location.hash && window.location.hash.includes('access_token')) {
+                    try {
+                        window.history.replaceState(null, '', window.location.pathname);
+                    } catch (_) {}
+                }
+
+                if (typeof onUserChange === 'function') {
+                    onUserChange(user, event);
+                }
+            } else if (event === 'SIGNED_OUT') {
+                localStorage.removeItem(STORAGE_KEY_AUTH_USER);
+                if (typeof onUserChange === 'function') {
+                    onUserChange(null, event);
+                }
+            }
+        });
     }
 
     // Expose API globally
@@ -396,9 +472,28 @@
         signUp,
         signInWithOAuth,
         syncAuthSession,
+        initAuthListener,
         signOut,
         getCurrentUser,
         loginDemoAnalyst,
+        ADMIN_EMAIL,
+        isUserAdmin,
         isConnected: () => !!getClient()
     };
+
+    // Auto-fetch runtime environment config from server if available
+    if (typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http')) {
+        fetch('/api/config')
+            .then(res => res.json())
+            .then(cfg => {
+                if (cfg && cfg.supabaseUrl && cfg.supabaseAnonKey) {
+                    window.SUPABASE_CONFIG = {
+                        url: cfg.supabaseUrl,
+                        key: cfg.supabaseAnonKey,
+                        projectId: cfg.projectId
+                    };
+                }
+            })
+            .catch(() => {});
+    }
 })();

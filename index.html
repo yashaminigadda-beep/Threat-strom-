@@ -14,6 +14,66 @@
 </head>
 <body class="dashboard-body">
 
+    <!-- ═══ Sovereign Luxury Bureau Intro Screen (Displays on site load) ═══ -->
+    <div id="luxury-bureau-intro" class="luxury-bureau-intro" aria-label="Threat Storm Cyber Intelligence Bureau Intro">
+        <div class="intro-backdrop-radial"></div>
+        <div class="intro-ambient-vignette"></div>
+        <button type="button" class="intro-skip-btn" id="intro-skip-btn" aria-label="Skip to Dashboard" title="Skip to Dashboard (Esc)">
+            <span>Skip</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+        </button>
+
+        <div class="intro-card">
+            <!-- Bureau Gold Insignia -->
+            <div class="intro-crest-container">
+                <div class="intro-crest-glow"></div>
+                <div class="intro-crest-shield">
+                    <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                        <polygon points="32,4 58,16 58,40 32,60 6,40 6,16" stroke="url(#goldGradientIntro)" stroke-width="2" fill="rgba(212,175,55,0.06)"/>
+                        <polygon points="32,10 52,20 52,38 32,53 12,38 12,20" stroke="rgba(212,175,55,0.4)" stroke-width="1.2" fill="none"/>
+                        <polygon points="32,18 35,27 44,27 37,33 40,42 32,36 24,42 27,33 20,27 29,27" fill="url(#goldGradientIntro)" filter="drop-shadow(0 0 8px rgba(212,175,55,0.8))"/>
+                        <circle cx="32" cy="30" r="2.5" fill="#ffffff"/>
+                        <defs>
+                            <linearGradient id="goldGradientIntro" x1="6" y1="4" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#fff6d6"/>
+                                <stop offset="35%" stop-color="#d4af37"/>
+                                <stop offset="70%" stop-color="#aa8012"/>
+                                <stop offset="100%" stop-color="#f3d068"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Sovereign Intel Tag -->
+            <div class="intro-clearance-tag">
+                <span class="intro-pulse-dot"></span>
+                <span>SOVEREIGN THREAT INTELLIGENCE COMMAND</span>
+            </div>
+
+            <!-- Primary Bureau Brand Name -->
+            <h1 class="intro-brand-title">THREAT STORM</h1>
+
+            <!-- Elegant Gold Hairline Divider -->
+            <div class="intro-gold-divider">
+                <span class="divider-line"></span>
+                <span class="divider-diamond">✦</span>
+                <span class="divider-line"></span>
+            </div>
+
+            <!-- Bureau Subtitle -->
+            <div class="intro-bureau-subtitle">CYBER INTELLIGENCE BUREAU</div>
+
+            <!-- Built by VoidX Credit -->
+            <div class="intro-voidx-badge">
+                <span class="voidx-spark">✦</span>
+                <span class="voidx-text">BUILT BY <strong class="voidx-name">VOIDX</strong></span>
+            </div>
+        </div>
+    </div>
+
     <!-- ═══ Background Atmosphere ═══ -->
     <div class="bg-atmosphere" aria-hidden="true">
         <div class="bg-atmosphere__radial-top"></div>
@@ -67,37 +127,61 @@
                     <span>EvidenceChain</span>
                     <span class="nav-badge-new">NEW</span>
                 </a>
-                <a href="#recent-threats-section" class="nav-item" id="menu-feed">
+                <a href="#view-url-scanner" class="nav-item" id="menu-url-scanner">
+                    <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span>URL Scanner</span>
+                    <span class="nav-badge-new" style="background: rgba(212,175,55,0.2); color: var(--gold-bright); border-color: rgba(212,175,55,0.5);">LIVE</span>
+                </a>
+                <a href="#view-ai-model" class="nav-item" id="menu-ai-model">
+                    <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.5V11h3a3 3 0 0 1 3 3v1a2 2 0 0 1-2 2h-1v2a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3v-2H6a2 2 0 0 1-2-2v-1a3 3 0 0 1 3-3h3V9.5C8.8 8.8 8 7.5 8 6a4 4 0 0 1 4-4z"/>
+                        <circle cx="9" cy="6" r="1" fill="currentColor"/>
+                        <circle cx="15" cy="6" r="1" fill="currentColor"/>
+                    </svg>
+                    <span>VoidX AI Studio</span>
+                    <span class="nav-badge-new" style="background: linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(0,240,255,0.2) 100%); color: #38bdf8; border-color: rgba(56,189,248,0.5);">70B AI</span>
+                </a>
+                <a href="#view-feed" class="nav-item" id="menu-feed">
                     <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
                     </svg>
                     <span>Intelligence Feed</span>
                 </a>
-                <a href="#stats-grid" class="nav-item" id="menu-sector">
+                <a href="#view-sector" class="nav-item" id="menu-sector">
                     <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
                     </svg>
                     <span>Sector Matrix</span>
                 </a>
-                <a href="#recent-threats-section" class="nav-item" id="menu-alerts">
+                <a href="#view-alerts" class="nav-item" id="menu-alerts">
                     <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                     </svg>
                     <span>Alerts</span>
                     <span class="nav-badge-count">28</span>
                 </a>
-                <a href="#latest-intel-card" class="nav-item" id="menu-reports">
+                <a href="#view-reports" class="nav-item" id="menu-reports">
                     <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
                     </svg>
                     <span>Reports</span>
                 </a>
-                <a href="#site-footer" class="nav-item" id="menu-settings">
+                <a href="#view-settings" class="nav-item" id="menu-settings">
                     <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
                     </svg>
                     <span>Settings</span>
                 </a>
+                <!-- Emergency Quick Response Action Button under Settings -->
+                <button type="button" class="nav-item nav-item--quick-response" id="menu-quick-response" aria-label="Open Quick Response Incident Form">
+                    <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="2.2">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                    <span>Quick Response</span>
+                    <span class="nav-badge-fast">FAST</span>
+                </button>
                 <a href="#view-auth" class="nav-item" id="menu-auth">
                     <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
@@ -137,23 +221,52 @@
 
             <!-- ═══ Top Header Navigation Bar ═══ -->
             <header class="top-nav">
+                <!-- Bureau Brand Mark -->
+                <div class="top-nav__brand">
+                    <div class="top-nav__brand-crest">
+                        <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+                            <polygon points="16,2 29,8 29,20 16,30 3,20 3,8" stroke="#d4af37" stroke-width="1.8" fill="rgba(212,175,55,0.12)"/>
+                            <polygon points="16,6 25,10 25,18 16,25 7,18 7,10" stroke="#00e676" stroke-width="1.2" fill="none"/>
+                            <circle cx="16" cy="15" r="2.5" fill="#d4af37"/>
+                        </svg>
+                    </div>
+                    <div class="top-nav__brand-info">
+                        <span class="top-nav__brand-title">THREAT STORM</span>
+                        <span class="top-nav__brand-sub">CYBER INTELLIGENCE BUREAU</span>
+                    </div>
+                    <span class="top-nav__brand-badge">BUILT BY VOIDX</span>
+                </div>
+
                 <!-- Center Navigation Tabs -->
                 <nav class="top-nav__tabs">
                     <button type="button" class="tab-pill tab-pill--active" id="tab-planetary">Planetary Threat Map</button>
                     <button type="button" class="tab-pill" id="tab-evidence-chain">EvidenceChain</button>
+                    <button type="button" class="tab-pill" id="tab-url-scanner">⚡ URL Scanner</button>
+                    <button type="button" class="tab-pill" id="tab-ai-model">🧠 VoidX AI</button>
                     <button type="button" class="tab-pill" id="tab-feed">Intelligence Feed</button>
                     <button type="button" class="tab-pill" id="tab-sector">Sector Matrix</button>
+                    <button type="button" class="tab-pill" id="tab-alerts">Alerts (28)</button>
                     <button type="button" class="tab-pill" id="tab-reports">Reports</button>
                     <button type="button" class="tab-pill" id="tab-settings">Settings</button>
+                    <button type="button" class="tab-pill tab-pill--quick-response" id="tab-quick-response" style="background: rgba(225, 29, 72, 0.15); border: 1px solid rgba(225, 29, 72, 0.45); color: #ff3366;">⚡ Quick Response</button>
                     <button type="button" class="tab-pill" id="tab-auth">Sign In / Clearance</button>
                 </nav>
 
                 <!-- Right Utility Icons -->
                 <div class="top-nav__actions">
-                    <button type="button" class="action-btn" id="btn-search-toggle" aria-label="Search threat database">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <!-- Unique Futuristic Cyber Omnibar Search Button -->
+                    <button type="button" class="nav-omnibar-btn" id="btn-search-toggle" aria-label="Search Cyber Database (Ctrl+K)">
+                        <svg class="omnibar-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
                         </svg>
+                        <span class="omnibar-label">Search IOCs, URLs, MITRE, Threats...</span>
+                        <kbd class="omnibar-kbd">Ctrl K</kbd>
+                    </button>
+                    <!-- VoidX Cyber AI Copilot Quick Trigger -->
+                    <button type="button" class="nav-ai-btn" id="btn-header-ai-copilot" aria-label="Open VoidX Cyber AI Copilot (Ctrl+I)" title="VoidX Cyber AI Copilot (Ctrl+I)">
+                        <span class="ai-spark-icon">🧠</span>
+                        <span class="ai-btn-title">VoidX AI</span>
+                        <span class="ai-model-tag">70B</span>
                     </button>
                     <button type="button" class="action-btn action-btn--has-badge" id="btn-notifications" aria-label="Notifications">
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -180,8 +293,11 @@
                                 <span class="avatar-status-dot"></span>
                             </div>
                             <div class="user-callsign-info" id="nav-user-info">
-                                <span class="user-callsign" id="nav-user-callsign">Commander Yash K.</span>
-                                <span class="user-clearance" id="nav-user-clearance">TOP SECRET // LEVEL 5</span>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span class="user-callsign" id="nav-user-callsign">Commander Yaswanth</span>
+                                    <span class="nav-admin-crown-badge" id="nav-admin-badge" style="display: none;">👑 ADMIN</span>
+                                </div>
+                                <span class="user-clearance" id="nav-user-clearance">LEVEL 5 // GLOBAL SOC ADMIN</span>
                             </div>
                             <svg class="user-dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6 9 12 15 18 9"/>
@@ -194,6 +310,15 @@
                                     <span class="dropdown-role" id="dropdown-user-role">SOC Lead Commander</span>
                                 </div>
                                 <div class="dropdown-divider"></div>
+                                <button type="button" class="dropdown-item" id="btn-menu-switch-google" style="color: #38bdf8;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24">
+                                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                                    </svg>
+                                    <span>Switch / Select Another Google Account</span>
+                                </button>
                                 <button type="button" class="dropdown-item" id="btn-menu-settings">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -419,12 +544,87 @@
 
                 </section>
 
+                <!-- ═══ Quick Real-Time URL Threat Scanner Banner ═══ -->
+                <div class="quick-url-scanner-card" id="quick-url-scanner-card">
+                    <div class="quick-scanner-header">
+                        <div class="quick-scanner-title-box">
+                            <div class="quick-scanner-icon">⚡</div>
+                            <div>
+                                <span class="quick-scanner-title">Live Website Threat &amp; URL Reputation Scanner</span>
+                                <span class="quick-scanner-sub">DNS A/AAAA • TLS 1.3 • Phishing Heuristics • Real-Time Intercept</span>
+                            </div>
+                        </div>
+                        <button type="button" class="tab-pill" id="btn-open-full-scanner" style="font-size: 11px; padding: 4px 10px;">
+                            <span>Launch Deep Radar Station ↗</span>
+                        </button>
+                    </div>
+
+                    <div class="quick-scanner-input-row">
+                        <div class="quick-scanner-input-wrapper">
+                            <span class="quick-scanner-protocol-tag">TARGET</span>
+                            <input type="text" id="quick-scanner-input" class="quick-scanner-input" placeholder="Enter any website URL or domain (e.g. evil-phish-bank.xyz, google.com, or raw IP)...">
+                        </div>
+                        <button type="button" id="btn-quick-scan-submit" class="quick-scanner-btn">
+                            <span>⚡ SCAN LIVE</span>
+                        </button>
+                    </div>
+
+                    <!-- Sample Quick Chips -->
+                    <div class="quick-scanner-chips">
+                        <span class="chip-label">QUICK SAMPLES:</span>
+                        <button type="button" class="sample-chip sample-chip--malicious" data-url="https://evil-phish-bank.xyz/login">
+                            <span>🔴 evil-phish-bank.xyz (Phishing)</span>
+                        </button>
+                        <button type="button" class="sample-chip sample-chip--malicious" data-url="http://update-win-payload.cc/beacon.exe">
+                            <span>🔴 update-win-payload.cc (C2 Malware)</span>
+                        </button>
+                        <button type="button" class="sample-chip sample-chip--safe" data-url="https://github.com">
+                            <span>🟢 github.com (Safe)</span>
+                        </button>
+                        <button type="button" class="sample-chip sample-chip--safe" data-url="https://google.com">
+                            <span>🟢 google.com (Safe)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ═══ High-Impact Admin Welcome & Command Banner ═══ -->
+                <div class="admin-welcome-strip" id="admin-welcome-strip" style="display: none;">
+                    <div class="admin-strip-badge">
+                        <span class="admin-crown-icon">👑</span>
+                        <div class="admin-strip-title-group">
+                            <span class="admin-strip-title">WELCOME TO ADMIN DASHBOARD</span>
+                            <span class="admin-strip-sub">Lead Cyber Command Operations • Full Level 5 Administrative Clearance Active</span>
+                        </div>
+                    </div>
+                    <div class="admin-strip-details">
+                        <span class="admin-strip-user" id="admin-strip-user">Commander Yaswanth (yaswanthkumaraminigadda@gmail.com)</span>
+                    </div>
+                    <div class="admin-strip-actions">
+                        <span class="admin-pulse-pill">● ADMIN ONLINE</span>
+                    </div>
+                </div>
+
                 <!-- ═══ 1. Hero Section: Editorial Headline & 3D Rotating Earth Globe ═══ -->
                 <section class="hero-section" id="hero-section">
                     <div class="hero-grid">
 
                         <!-- Left Column: Editorial Headline & Feature Tags -->
                         <div class="hero-left">
+                            <!-- Prominent Bureau Header Badge -->
+                            <div class="hero-bureau-crest-strip">
+                                <div class="hero-crest-emblem">
+                                    <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+                                        <polygon points="16,2 29,8 29,20 16,30 3,20 3,8" stroke="#d4af37" stroke-width="2" fill="rgba(212,175,55,0.15)"/>
+                                        <polygon points="16,6 25,10 25,18 16,25 7,18 7,10" stroke="#00e676" stroke-width="1.2" fill="none"/>
+                                        <circle cx="16" cy="15" r="2" fill="#d4af37"/>
+                                    </svg>
+                                </div>
+                                <span class="hero-bureau-label">THREAT STORM</span>
+                                <span class="hero-bureau-sep">/</span>
+                                <span class="hero-bureau-sub">CYBER INTELLIGENCE BUREAU</span>
+                                <span class="hero-bureau-voidx">BUILT BY VOIDX</span>
+                            </div>
+
                             <div class="hero-eyebrow">
                                 <span class="eyebrow-text">GLOBAL CYBER THREAT INTELLIGENCE</span>
                                 <span class="eyebrow-dot">•</span>
@@ -1009,6 +1209,11 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                    </div>
+                </section>
+
                 <!-- ═══ 4. View: Intelligence Feed with Raw AI Threat Data ═══ -->
                 <section class="dashboard-view-section" id="view-feed" style="display: none;">
                     <div class="view-header-card">
@@ -1104,9 +1309,12 @@
                                 Real-time telemetry ingestion health, kernel intercept pipeline latencies, and raw sensor diagnostics for global cyber surveillance.
                             </p>
                         </div>
-                        <div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
                             <button type="button" class="ev-btn ev-btn--primary" id="btn-ping-all-sensors">
                                 <span>⚡ Ping All 28 Sensors</span>
+                            </button>
+                            <button type="button" class="ev-btn ev-btn--emergency" id="btn-settings-quick-response" style="background: linear-gradient(135deg, rgba(225,29,72,0.2) 0%, rgba(225,29,72,0.4) 100%); border: 1px solid #ff2d55; color: #ffffff;">
+                                <span>🚨 Quick Response Form</span>
                             </button>
                         </div>
                     </div>
@@ -1141,13 +1349,13 @@
                                 <label for="sb-input-url" style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #38bdf8; margin-bottom: 6px; font-weight: 600;">
                                     Supabase Project URL
                                 </label>
-                                <input type="text" id="sb-input-url" class="ev-search-input" value="https://vlwdxlwmljigbxncxqdm.supabase.co" placeholder="https://your-project.supabase.co" style="width: 100%; box-sizing: border-box; font-family: var(--font-mono, monospace); font-size: 12px;">
+                                <input type="text" id="sb-input-url" class="ev-search-input" value="" placeholder="https://your-project.supabase.co" style="width: 100%; box-sizing: border-box; font-family: var(--font-mono, monospace); font-size: 12px;">
                             </div>
                             <div class="sb-input-group">
                                 <label for="sb-input-key" style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #d4af37; margin-bottom: 6px; font-weight: 600;">
                                     Supabase Public Anon Key
                                 </label>
-                                <input type="password" id="sb-input-key" class="ev-search-input" value="sb_publishable_U0ECEE9mpLSQe4z8DwnVLA_fdU6vwnG" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." style="width: 100%; box-sizing: border-box; font-family: var(--font-mono, monospace); font-size: 12px;">
+                                <input type="password" id="sb-input-key" class="ev-search-input" value="" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." style="width: 100%; box-sizing: border-box; font-family: var(--font-mono, monospace); font-size: 12px;">
                             </div>
                         </div>
 
@@ -1244,6 +1452,505 @@
                             </tbody>
                         </table>
                     </div>
+                </section>
+
+                <!-- ═══ 8.5 View: Live Website & URL Threat Scanner Engine ═══ -->
+                <section class="dashboard-view-section" id="view-url-scanner" style="display: none;">
+                    <div class="view-header-card">
+                        <div class="view-header-left">
+                            <div class="view-badge-row">
+                                <span class="ev-badge-chip ev-chip--gold">RADAR INTERCEPT ENGINE</span>
+                                <span class="ev-badge-chip ev-chip--crit">REAL-TIME THREAT VERDICT</span>
+                                <span class="ev-badge-chip ev-chip--sample">LIVE DNS &amp; TLS PROBE</span>
+                            </div>
+                            <h2 class="view-title">
+                                <span>Live Website &amp; URL Threat Intelligence Radar</span>
+                            </h2>
+                            <p class="view-desc">
+                                Execute instantaneous forensic analysis on any external URL, domain, or IP address. Inspect live DNS resolution, cryptographic certificate validity, phishing heuristics, and known APT Command &amp; Control signatures.
+                            </p>
+                        </div>
+                        <div class="view-filter-bar">
+                            <span class="ev-badge-chip ev-chip--gold" id="scanner-status-pill">● RADAR READY</span>
+                        </div>
+                    </div>
+
+                    <div class="url-scanner-grid">
+                        
+                        <!-- Left Column: Scanner Station Form & Results -->
+                        <div class="scanner-station-card">
+                            
+                            <!-- Scanner Form -->
+                            <div class="scanner-form-box">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <label for="scanner-main-input" style="font-family: var(--font-heading); font-size: 13px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 0.05em;">
+                                        Target Web Address / Hostname
+                                    </label>
+                                    <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gold-bright);">REAL-TIME ACTIVE PROBE</span>
+                                </div>
+
+                                <div class="quick-scanner-input-wrapper">
+                                    <span class="quick-scanner-protocol-tag">TARGET</span>
+                                    <input type="text" id="scanner-main-input" class="quick-scanner-input" placeholder="e.g. https://evil-phish-bank.xyz/login or google.com..." style="font-size: 14px; padding: 12px 14px 12px 76px;">
+                                </div>
+
+                                <!-- Deep Heuristic Checkboxes -->
+                                <div class="scanner-options-row">
+                                    <label class="scanner-opt-check">
+                                        <input type="checkbox" id="chk-phishing" checked>
+                                        <span>Phishing Heuristics</span>
+                                    </label>
+                                    <label class="scanner-opt-check">
+                                        <input type="checkbox" id="chk-malware" checked>
+                                        <span>C2 / Malware Signatures</span>
+                                    </label>
+                                    <label class="scanner-opt-check">
+                                        <input type="checkbox" id="chk-tls" checked>
+                                        <span>SSL / TLS Handshake</span>
+                                    </label>
+                                    <label class="scanner-opt-check">
+                                        <input type="checkbox" id="chk-dns" checked>
+                                        <span>Live DNS A/AAAA Probe</span>
+                                    </label>
+                                </div>
+
+                                <!-- Scan Trigger Button -->
+                                <button type="button" id="btn-run-deep-scan" class="portal-btn-primary" style="margin-top: 6px;">
+                                    <span id="scanner-btn-label">⚡ INITIATE DEEP LIVE THREAT SCAN</span>
+                                </button>
+
+                                <!-- Quick Presets -->
+                                <div class="quick-scanner-chips" style="margin-top: 14px;">
+                                    <span class="chip-label">INSTANT PRESETS:</span>
+                                    <button type="button" class="sample-chip sample-chip--malicious" data-url="https://evil-phish-bank.xyz/login">
+                                        <span>🔴 evil-phish-bank.xyz (Phishing)</span>
+                                    </button>
+                                    <button type="button" class="sample-chip sample-chip--malicious" data-url="http://update-win-payload.cc/beacon.exe">
+                                        <span>🔴 update-win-payload.cc (C2 Dropper)</span>
+                                    </button>
+                                    <button type="button" class="sample-chip sample-chip--malicious" data-url="http://185.220.101.44/c2">
+                                        <span>🔴 185.220.101.44 (Direct IP C2)</span>
+                                    </button>
+                                    <button type="button" class="sample-chip sample-chip--safe" data-url="https://github.com">
+                                        <span>🟢 github.com (Clean)</span>
+                                    </button>
+                                    <button type="button" class="sample-chip sample-chip--safe" data-url="https://google.com">
+                                        <span>🟢 google.com (Clean)</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Live Scan Results Container -->
+                            <div id="scanner-results-container" style="display: none;">
+                                
+                                <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 20px 0;"></div>
+
+                                <!-- Verdict Banner -->
+                                <div id="verdict-banner" class="verdict-banner verdict-banner--critical">
+                                    <div class="verdict-left">
+                                        <div class="verdict-icon-badge" id="verdict-icon">⚠️</div>
+                                        <div>
+                                            <div class="verdict-title" id="verdict-title">CRITICAL THREAT DETECTED</div>
+                                            <div class="verdict-target" id="verdict-target-url">https://evil-phish-bank.xyz/login</div>
+                                        </div>
+                                    </div>
+                                    <div class="verdict-score-box">
+                                        <div class="verdict-score-num" id="verdict-score-num">96%</div>
+                                        <div class="verdict-score-lbl">RISK COEFFICIENT</div>
+                                    </div>
+                                </div>
+
+                                <!-- Core Telemetry Breakdown -->
+                                <div style="margin-top: 16px;">
+                                    <h4 style="font-family: var(--font-heading); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold-bright); margin-bottom: 10px;">
+                                        Diagnostic Telemetry &amp; Geo-Attribution
+                                    </h4>
+                                    <div class="telemetry-kv-grid">
+                                        <div class="telemetry-kv-card">
+                                            <div class="telemetry-kv-label">Resolved IP Address</div>
+                                            <div class="telemetry-kv-val" id="res-ip">185.220.101.93</div>
+                                        </div>
+                                        <div class="telemetry-kv-card">
+                                            <div class="telemetry-kv-label">Protocol &amp; Port</div>
+                                            <div class="telemetry-kv-val" id="res-proto">HTTPS // 443</div>
+                                        </div>
+                                        <div class="telemetry-kv-card">
+                                            <div class="telemetry-kv-label">DNS Resolution Latency</div>
+                                            <div class="telemetry-kv-val" id="res-latency" style="color:#38bdf8;">142 ms</div>
+                                        </div>
+                                        <div class="telemetry-kv-card">
+                                            <div class="telemetry-kv-label">Routing ASN</div>
+                                            <div class="telemetry-kv-val" id="res-asn">AS16276 Bulletproof Offshore</div>
+                                        </div>
+                                        <div class="telemetry-kv-card">
+                                            <div class="telemetry-kv-label">Geographic Origin</div>
+                                            <div class="telemetry-kv-val" id="res-geo">Seychelles (SC)</div>
+                                        </div>
+                                        <div class="telemetry-kv-card">
+                                            <div class="telemetry-kv-label">MITRE ATT&amp;CK Mapping</div>
+                                            <div class="telemetry-kv-val" id="res-mitre" style="color:var(--gold-bright);">T1566.002 • T1071</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Detected Indicators List -->
+                                <div style="margin-top: 16px;" id="box-detected-threats">
+                                    <h4 style="font-family: var(--font-heading); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #f87171; margin-bottom: 8px;">
+                                        Correlated Threat Indicators
+                                    </h4>
+                                    <div id="list-detected-threats" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                                </div>
+
+                                <!-- Security Audit Checklist -->
+                                <div style="margin-top: 16px;">
+                                    <h4 style="font-family: var(--font-heading); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #ffffff; margin-bottom: 10px;">
+                                        Comprehensive Inspection Gates
+                                    </h4>
+                                    <div class="security-checklist" id="list-security-checks"></div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="scan-actions-row">
+                                    <button type="button" class="btn-scan-action btn-scan-action--gold" id="btn-save-threat-supabase">
+                                        <span>📥 Push Threat to Supabase Cloud</span>
+                                    </button>
+                                    <button type="button" class="btn-scan-action btn-scan-action--cyan" id="btn-scanner-to-evidence">
+                                        <span>🔗 Correlate in EvidenceChain</span>
+                                    </button>
+                                    <button type="button" class="btn-scan-action btn-scan-action--dim" id="btn-copy-scan-json">
+                                        <span>📋 Copy JSON Dossier</span>
+                                    </button>
+                                </div>
+
+                                <!-- ═══ RAW INFORMATION / TELEMETRY INSPECTOR CONSOLE ═══ -->
+                                <div class="raw-inspector-card" id="raw-inspector-card" style="margin-top: 24px;">
+                                    <div class="raw-inspector-header">
+                                        <div class="raw-inspector-title-row">
+                                            <span class="raw-inspector-badge">RAW TELEMETRY</span>
+                                            <span class="raw-inspector-title">Forensic Wire &amp; Threat Telemetry Stream</span>
+                                        </div>
+                                        <div class="raw-inspector-tabs">
+                                            <button type="button" class="raw-tab-btn raw-tab-btn--active" data-raw-tab="json">
+                                                <span>📄 Raw JSON</span>
+                                            </button>
+                                            <button type="button" class="raw-tab-btn" data-raw-tab="http">
+                                                <span>🌐 HTTP Wire</span>
+                                            </button>
+                                            <button type="button" class="raw-tab-btn" data-raw-tab="dns">
+                                                <span>📡 DNS Dump (dig)</span>
+                                            </button>
+                                            <button type="button" class="raw-tab-btn" data-raw-tab="engines">
+                                                <span>🛡️ Threat Engines</span>
+                                            </button>
+                                            <button type="button" class="raw-tab-btn" data-raw-tab="ssl">
+                                                <span>🔒 TLS Cert</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="raw-code-container">
+                                        <button type="button" class="raw-code-copy-float" id="btn-copy-active-raw">
+                                            <span>📋 Copy View</span>
+                                        </button>
+                                        <pre class="raw-code-block"><code id="raw-code-viewport">Awaiting scan telemetry...</code></pre>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Right Column: Live Radar Screen & Real-Time Terminal Stream -->
+                        <div class="scanner-station-card">
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                                <h3 style="font-family: var(--font-heading); font-size: 14px; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+                                    <span style="color: #38bdf8;">📡</span>
+                                    <span>Real-Time Radar &amp; Telemetry Stream</span>
+                                </h3>
+                                <span class="ev-badge-chip ev-chip--gold" id="radar-sweep-status">SWEEPER ACTIVE</span>
+                            </div>
+
+                            <!-- Radar Screen Visualizer -->
+                            <div class="scanner-radar-wrapper" id="scanner-radar-wrapper">
+                                <div class="scanner-radar-screen">
+                                    <div class="radar-ring radar-ring-1"></div>
+                                    <div class="radar-ring radar-ring-2"></div>
+                                    <div class="radar-ring radar-ring-3"></div>
+                                    <div class="radar-crosshair-h"></div>
+                                    <div class="radar-crosshair-v"></div>
+                                    <div class="radar-sweep-beam"></div>
+                                    <div class="radar-target-blip" id="radar-blip" style="top: 35%; left: 65%;"></div>
+                                </div>
+                                <div style="margin-top: 14px; font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); text-align: center;">
+                                    PLANETARY SENSOR SWEEP // FREQUENCY: 14.8 GHz // PROTOCOL: SYN PROBE
+                                </div>
+                            </div>
+
+                            <!-- Terminal Log Box -->
+                            <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gold-bright); text-transform: uppercase;">
+                                    LIVE TELEMETRY STREAM
+                                </span>
+                                <span style="font-family: var(--font-mono); font-size: 9px; color: var(--text-tertiary);">
+                                    BUFFER: ONLINE
+                                </span>
+                            </div>
+                            <div class="scanner-terminal-box" id="scanner-terminal-logs">
+                                <div class="scanner-terminal-line">
+                                    <span class="scanner-term-time">[00:00:00]</span>
+                                    <span class="scanner-term-tag">[SYSTEM]</span>
+                                    <span class="scanner-term-msg--pass">URL Threat Radar initialized and listening for target input.</span>
+                                </div>
+                            </div>
+
+                            <!-- Live SOC Recommendations Box -->
+                            <div style="margin-top: 16px; background: rgba(2, 6, 23, 0.7); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 6px; padding: 12px 14px;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                    <span style="font-size: 14px;">🛡️</span>
+                                    <span style="font-family: var(--font-heading); font-size: 11px; font-weight: 700; color: var(--gold-bright); text-transform: uppercase; letter-spacing: 0.05em;">
+                                        Automated SOC Remediation Guidance
+                                    </span>
+                                </div>
+                                <p id="scanner-recommendation-text" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin: 0;">
+                                    Awaiting URL submission to generate threat mitigation procedures.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- ═══ 8.8 View: VoidX AI™ Cyber Threat Studio ═══ -->
+                <section class="dashboard-view-section" id="view-ai-model" style="display: none;">
+                    
+                    <!-- AI Studio Header Card -->
+                    <div class="view-header-card ai-studio-header-card">
+                        <div class="view-header-left">
+                            <div class="view-badge-row">
+                                <span class="ev-badge-chip ev-chip--gold">🧠 VOIDX AI™ v3.2</span>
+                                <span class="ev-badge-chip ev-chip--crit">70B PARAMETER MOE</span>
+                                <span class="ev-badge-chip ev-chip--sample">128K CONTEXT WINDOW</span>
+                                <span class="ev-badge-chip" style="background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.4);">● MODEL WEIGHTS LOADED</span>
+                            </div>
+                            <h2 class="view-title">
+                                <span>VoidX AI™ Cyber Intelligence Model &amp; Reasoning Studio</span>
+                            </h2>
+                            <p class="view-desc">
+                                Autonomous frontier VoidX cyber AI model specialized in threat actor attribution, zero-day decompilation, dynamic YARA synthesis, MITRE killchain correlation, and automated incident containment playbooks.
+                            </p>
+                        </div>
+
+                        <!-- Real-time Model Telemetry Metrics -->
+                        <div class="ai-model-metrics-row">
+                            <div class="ai-metric-pill">
+                                <span class="ai-metric-label">ARCHITECTURE</span>
+                                <span class="ai-metric-val">Transformer MoE</span>
+                            </div>
+                            <div class="ai-metric-pill">
+                                <span class="ai-metric-label">WEIGHTS</span>
+                                <span class="ai-metric-val">70B FP16 Tensor</span>
+                            </div>
+                            <div class="ai-metric-pill">
+                                <span class="ai-metric-label">LATENCY</span>
+                                <span class="ai-metric-val" id="hud-model-latency">18 ms</span>
+                            </div>
+                            <div class="ai-metric-pill">
+                                <span class="ai-metric-label">TOKEN SPEED</span>
+                                <span class="ai-metric-val" id="hud-model-tps">74.2 t/s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Studio Split Workspace -->
+                    <div class="ai-studio-workspace">
+                        
+                        <!-- Left Panel: Model Query Workbench & Prompts -->
+                        <div class="ai-workbench-card">
+                            
+                            <!-- Model Persona / Specialty Selector -->
+                            <div class="ai-control-group">
+                                <label class="ai-control-label">SPECIALIZED VOIDX CYBER MODEL</label>
+                                <div class="ai-model-selector-grid">
+                                    <button type="button" class="ai-model-btn ai-model-btn--active" data-model="VoidX-Cyber-70B">
+                                        <span class="ai-model-icon">🧠</span>
+                                        <div class="ai-model-info">
+                                            <span class="ai-model-name">VoidX-70B</span>
+                                            <span class="ai-model-desc">Threat Hunter &amp; Attribution</span>
+                                        </div>
+                                    </button>
+                                    <button type="button" class="ai-model-btn" data-model="MitreMapper-v4">
+                                        <span class="ai-model-icon">🎯</span>
+                                        <div class="ai-model-info">
+                                            <span class="ai-model-name">MitreMapper-v4</span>
+                                            <span class="ai-model-desc">TTP Matrix Killchain Correlator</span>
+                                        </div>
+                                    </button>
+                                    <button type="button" class="ai-model-btn" data-model="YARAGuard-Synthesizer">
+                                        <span class="ai-model-icon">🛡️</span>
+                                        <div class="ai-model-info">
+                                            <span class="ai-model-name">YARAGuard-Synth</span>
+                                            <span class="ai-model-desc">Rule &amp; Containment Generator</span>
+                                        </div>
+                                    </button>
+                                    <button type="button" class="ai-model-btn" data-model="ZeroDay-Explainer">
+                                        <span class="ai-model-icon">⚡</span>
+                                        <div class="ai-model-info">
+                                            <span class="ai-model-name">ZeroDay-Explainer</span>
+                                            <span class="ai-model-desc">CVE &amp; Exploit Decompiler</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Preset Prompt Chips -->
+                            <div class="ai-control-group">
+                                <label class="ai-control-label">INSTANT THREAT SCENARIOS</label>
+                                <div class="ai-prompt-presets">
+                                    <button type="button" class="ai-preset-chip" data-prompt="Analyze LockBit 3.0 double-extortion ransomware killchain and generate defensive YARA rule">
+                                        🔴 LockBit 3.0 Ransomware
+                                    </button>
+                                    <button type="button" class="ai-preset-chip" data-prompt="Investigate APT28 BlackEnergy SCADA attack and generate lateral movement containment script">
+                                        🇷🇺 APT28 (Fancy Bear)
+                                    </button>
+                                    <button type="button" class="ai-preset-chip" data-prompt="Decompile CVE-2024-38077 Windows RPKI Remote Code Execution with CVSS 9.8 mitigation">
+                                        ⚡ CVE-2024-38077 RCE
+                                    </button>
+                                    <button type="button" class="ai-preset-chip" data-prompt="Correlate Cobalt Strike C2 malleable beaconing over HTTPS with firewall drop rules">
+                                        🎯 Cobalt Strike C2
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Query Prompt Input Box -->
+                            <div class="ai-control-group">
+                                <label for="ai-studio-query-input" class="ai-control-label">ANALYST QUERY / THREAT PAYLOAD / IOC</label>
+                                <textarea id="ai-studio-query-input" class="ai-query-textarea" rows="4" placeholder="Enter target IP, CVE, malware family, file hash, or threat investigation query (e.g. 'Analyze LockBit 3.0 and write YARA rule')..."></textarea>
+                            </div>
+
+                            <!-- Action Button Row -->
+                            <div class="ai-action-row">
+                                <button type="button" class="editorial-poster-btn" id="btn-run-ai-inference" style="flex: 1; justify-content: center; padding: 14px 20px;">
+                                    <span id="ai-btn-spinner" style="display: none;">⏳</span>
+                                    <span id="ai-btn-text">⚡ RUN VOIDX AI REASONING (70B)</span>
+                                </button>
+                                <button type="button" class="action-btn" id="btn-clear-ai-query" title="Clear Query" style="padding: 0 16px;">
+                                    <span>✕</span>
+                                </button>
+                            </div>
+
+                        </div>
+
+                        <!-- Right Panel: Neural Intelligence Dossier Output -->
+                        <div class="ai-dossier-card">
+                            
+                            <!-- Dossier Header & Tabs -->
+                            <div class="ai-dossier-header">
+                                <div class="ai-tabs-list">
+                                    <button type="button" class="ai-tab-btn ai-tab--active" data-tab="verdict">1. Executive Verdict</button>
+                                    <button type="button" class="ai-tab-btn" data-tab="killchain">2. MITRE ATT&amp;CK</button>
+                                    <button type="button" class="ai-tab-btn" data-tab="yara">3. YARA Rule</button>
+                                    <button type="button" class="ai-tab-btn" data-tab="containment">4. Containment Script</button>
+                                    <button type="button" class="ai-tab-btn" data-tab="telemetry">5. Raw Logits JSON</button>
+                                </div>
+                                <div class="ai-dossier-actions">
+                                    <button type="button" class="copy-raw-btn" id="btn-copy-ai-tab">📋 Copy Output</button>
+                                </div>
+                            </div>
+
+                            <!-- Dynamic AI Output Viewport -->
+                            <div class="ai-dossier-body" id="ai-dossier-body">
+                                
+                                <!-- Placeholder state before inference -->
+                                <div class="ai-empty-placeholder" id="ai-empty-placeholder">
+                                    <div class="ai-empty-icon">🧠</div>
+                                    <div class="ai-empty-title">VoidX AI™ 70B Model Standing By</div>
+                                    <div class="ai-empty-desc">
+                                        Select a preset scenario above or enter any CVE, IOC, or threat question, then execute inference to compile real-time cyber intelligence.
+                                    </div>
+                                </div>
+
+                                <!-- Live Output Container (hidden until run) -->
+                                <div class="ai-live-results" id="ai-live-results" style="display: none;">
+                                    
+                                    <!-- Tab 1: Verdict -->
+                                    <div class="ai-tab-panel" id="tab-panel-verdict">
+                                        <div class="ai-verdict-banner" id="ai-verdict-banner">
+                                            <div class="ai-verdict-tag" id="ai-verdict-tag">CRITICAL ACTIVE EXTORTION RISK</div>
+                                            <div class="ai-verdict-title" id="ai-verdict-title">LockBit 3.0 Double-Extortion Campaign</div>
+                                        </div>
+
+                                        <div class="ai-intel-kv-grid">
+                                            <div class="ai-kv-box">
+                                                <span class="ai-kv-k">THREAT ACTOR</span>
+                                                <span class="ai-kv-v" id="ai-kv-actor">LockBit 3.0 Core</span>
+                                            </div>
+                                            <div class="ai-kv-box">
+                                                <span class="ai-kv-k">GEOGRAPHIC ORIGIN</span>
+                                                <span class="ai-kv-v" id="ai-kv-origin">Eastern European Enclave</span>
+                                            </div>
+                                            <div class="ai-kv-box">
+                                                <span class="ai-kv-k">AI CONFIDENCE</span>
+                                                <span class="ai-kv-v" id="ai-kv-confidence">98.7%</span>
+                                            </div>
+                                            <div class="ai-kv-box">
+                                                <span class="ai-kv-k">INFERENCE LATENCY</span>
+                                                <span class="ai-kv-v" id="ai-kv-latency">24 ms</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="ai-summary-box">
+                                            <h4 class="ai-section-heading">VOIDX AI EXECUTIVE BRIEFING</h4>
+                                            <p id="ai-summary-text" class="ai-summary-paragraph"></p>
+                                        </div>
+
+                                        <div class="ai-remediation-box">
+                                            <h4 class="ai-section-heading">PRIORITY INCIDENT MITIGATION STEPS</h4>
+                                            <ul id="ai-remediation-list" class="ai-steps-list"></ul>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tab 2: MITRE Killchain -->
+                                    <div class="ai-tab-panel" id="tab-panel-killchain" style="display: none;">
+                                        <h4 class="ai-section-heading">MITRE ATT&amp;CK ADVERSARY TTP KILLCHAIN MATRIX</h4>
+                                        <div class="ai-killchain-stream" id="ai-killchain-stream"></div>
+                                    </div>
+
+                                    <!-- Tab 3: YARA Rule -->
+                                    <div class="ai-tab-panel" id="tab-panel-yara" style="display: none;">
+                                        <div class="code-tab-header">
+                                            <span>AUTONOMOUS YARA DEFENSE SIGNATURE</span>
+                                            <button type="button" class="copy-raw-btn" id="btn-copy-yara-direct">📋 Copy YARA</button>
+                                        </div>
+                                        <pre class="ai-code-block"><code id="ai-code-yara"></code></pre>
+                                    </div>
+
+                                    <!-- Tab 4: Containment Script -->
+                                    <div class="ai-tab-panel" id="tab-panel-containment" style="display: none;">
+                                        <div class="code-tab-header">
+                                            <span>INCIDENT RESPONSE CONTAINMENT PLAYBOOK (BASH / PYTHON)</span>
+                                            <button type="button" class="copy-raw-btn" id="btn-copy-script-direct">📋 Copy Script</button>
+                                        </div>
+                                        <pre class="ai-code-block"><code id="ai-code-containment"></code></pre>
+                                    </div>
+
+                                    <!-- Tab 5: Telemetry JSON -->
+                                    <div class="ai-tab-panel" id="tab-panel-telemetry" style="display: none;">
+                                        <div class="code-tab-header">
+                                            <span>RAW MODEL INFERENCE LOGITS &amp; METADATA JSON</span>
+                                        </div>
+                                        <pre class="ai-code-block"><code id="ai-code-telemetry"></code></pre>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </section>
 
                 <!-- ═══ 9. View: Unique & Premium Cyber SOC Authentication Portal ═══ -->
@@ -1365,7 +2072,7 @@
                                         </label>
                                         <div class="portal-input-box">
                                             <span class="input-icon">✉️</span>
-                                            <input type="email" id="portal-input-email" placeholder="analyst@threatstorm.defense" required autocomplete="email">
+                                            <input type="email" id="portal-input-email" placeholder="yaswanthkumaraminigadda@gmail.com" required autocomplete="email">
                                         </div>
                                     </div>
 
@@ -1401,22 +2108,13 @@
                                         <span class="google-badge-verified">ACTIVE PROVIDER</span>
                                     </button>
 
-                                    <!-- Luxury Divider -->
-                                    <div class="portal-divider">
-                                        <span>OR 1-CLICK INSTANT CLEARANCE</span>
+                                    <!-- Official Security Notice -->
+                                    <div style="text-align: center; margin: 16px 0 8px; font-size: 11px; color: #64748b; font-family: var(--font-mono); letter-spacing: 0.04em;">
+                                        SECURE PROTOCOL • OFFICIAL GOOGLE IDENTITY VERIFICATION
                                     </div>
 
-                                    <!-- Demo Clearance Button -->
-                                    <button type="button" class="portal-btn-demo" id="portal-btn-demo">
-                                        <div class="demo-btn-left">
-                                            <span class="demo-shield">🛡️</span>
-                                            <div class="demo-text">
-                                                <span class="demo-title">Commander Yash K. Clearance</span>
-                                                <span class="demo-subtitle">SOC Level 5 • Full Admin Rights</span>
-                                            </div>
-                                        </div>
-                                        <span class="demo-arrow">→</span>
-                                    </button>
+                                    <!-- Hidden Demo Button for backward safety -->
+                                    <button type="button" class="portal-btn-demo" id="portal-btn-demo" style="display: none;"></button>
 
                                     <!-- Back to Map link -->
                                     <div style="text-align: center; margin-top: 14px;">
@@ -1433,7 +2131,7 @@
                                 <div class="terminal-footer">
                                     <div class="terminal-footer-line">
                                         <span class="t-shield-mini">🔒</span>
-                                        <span>Connected to Supabase PostgreSQL cluster (vlwdxlwmljigbxncxqdm)</span>
+                                        <span>Enterprise PostgreSQL Intelligence Cluster</span>
                                     </div>
                                 </div>
 
@@ -1652,7 +2350,7 @@
                         <label for="auth-input-email" style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #38bdf8; margin-bottom: 6px; font-weight: 600;">
                             Work Email Address
                         </label>
-                        <input type="email" id="auth-input-email" class="ev-search-input" placeholder="analyst@threatstorm.defense" required style="width: 100%; box-sizing: border-box; font-size: 13px;">
+                        <input type="email" id="auth-input-email" class="ev-search-input" placeholder="yaswanthkumaraminigadda@gmail.com" required style="width: 100%; box-sizing: border-box; font-size: 13px;">
                     </div>
 
                     <!-- Password Input -->
@@ -1685,20 +2383,256 @@
                         <span class="google-badge-verified">ACTIVE</span>
                     </button>
 
-                    <!-- Divider -->
-                    <div class="auth-or-divider">
-                        <span>OR QUICK ACCESS</span>
-                    </div>
+                    <!-- Hidden Demo Button for backward safety -->
+                    <button type="button" id="btn-auth-demo" style="display: none;"></button>
 
-                    <!-- Instant Demo Analyst Button -->
-                    <button type="button" class="ev-btn ev-btn--secondary" id="btn-auth-demo" style="width: 100%; padding: 10px; font-size: 12px; justify-content: center;">
-                        <span>🛡️ Instant Demo Access (Commander Yash K.)</span>
-                    </button>
+                    <!-- Switch to Full Portal Link -->
+                    <div style="text-align: center; margin-top: 14px;">
+                        <button type="button" id="btn-modal-to-portal" style="background: none; border: none; color: #38bdf8; font-family: var(--font-mono); font-size: 11px; cursor: pointer; text-decoration: underline; opacity: 0.9;">
+                            Switch to Full Command Center Portal ↗
+                        </button>
+                    </div>
 
                     <!-- Feedback message box -->
                     <div id="auth-feedback-box" style="display: none; margin-top: 14px; padding: 10px 14px; border-radius: 6px; font-size: 12px; font-family: var(--font-mono);"></div>
                 </form>
             </div>
+        </div>
+    </div>
+
+    <!-- ═══ Unique Universal Cyber Omnibar & Neural Threat Search Modal (Ctrl+K) ═══ -->
+    <div class="cyber-search-modal" id="cyber-search-modal" role="dialog" aria-modal="true" style="display: none;">
+        <div class="cyber-search-backdrop" id="cyber-search-backdrop"></div>
+        <div class="cyber-search-dialog">
+            
+            <!-- Top Search Input Bar with Scanning Pulse -->
+            <div class="cyber-search-input-header">
+                <div class="search-input-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                </div>
+                <input type="text" id="omni-search-input" class="omni-search-input" placeholder="Search threats, live URLs, MITRE T-codes, assets, commands..." autocomplete="off" spellcheck="false">
+                <div class="search-input-right">
+                    <span class="search-status-counter" id="search-results-count">Ready</span>
+                    <button type="button" class="search-clear-btn" id="btn-clear-omni-search" aria-label="Clear search" style="display: none;">✕</button>
+                    <kbd class="search-esc-badge" id="btn-close-omni-search">ESC</kbd>
+                </div>
+            </div>
+
+            <!-- Category Filter Pills Bar -->
+            <div class="cyber-search-filter-pills">
+                <button type="button" class="omni-filter-pill omni-filter-pill--active" data-cat="all">All Intelligence</button>
+                <button type="button" class="omni-filter-pill" data-cat="threats">🔴 Threats</button>
+                <button type="button" class="omni-filter-pill" data-cat="url">⚡ Live URL Scanner</button>
+                <button type="button" class="omni-filter-pill" data-cat="mitre">🎯 MITRE ATT&amp;CK</button>
+                <button type="button" class="omni-filter-pill" data-cat="sectors">🏢 Sectors</button>
+                <button type="button" class="omni-filter-pill" data-cat="commands">🚀 Quick Commands</button>
+            </div>
+
+            <!-- Dynamic Search Results Stream -->
+            <div class="cyber-search-results" id="cyber-search-results">
+                <!-- Dynamically populated by app.js -->
+            </div>
+
+            <!-- Interactive Search Footer HUD -->
+            <div class="cyber-search-footer">
+                <div class="search-footer-shortcuts">
+                    <span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+                    <span><kbd>↵</kbd> Select / Inspect</span>
+                    <span><kbd>ESC</kbd> Close</span>
+                    <span><kbd>Tab</kbd> Filter</span>
+                </div>
+                <div class="search-footer-brand">
+                    <span class="hud-shield-dot"></span>
+                    <span>THREAT STORM OMNIBAR v2.5</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═══ Floating Cyber AI Copilot Orb (Bottom-Right) ═══ -->
+    <button type="button" class="floating-ai-copilot-orb" id="floating-ai-copilot-orb" aria-label="Open VoidX Cyber AI Copilot (Ctrl+I)" title="VoidX Cyber AI Copilot (Ctrl+I)">
+        <div class="orb-pulse-rings" aria-hidden="true"></div>
+        <div class="orb-core">
+            <span class="orb-icon">🧠</span>
+        </div>
+        <div class="orb-tooltip">
+            <span class="orb-tooltip-title">VoidX AI 70B</span>
+            <span class="orb-tooltip-sub">Ask Cyber Threat Copilot (Ctrl+I)</span>
+        </div>
+    </button>
+
+    <!-- ═══ Slide-Out Cyber AI Copilot Chat Drawer ═══ -->
+    <div class="cyber-ai-drawer" id="cyber-ai-drawer" style="display: none;">
+        <div class="drawer-header">
+            <div class="drawer-title-group">
+                <span class="drawer-icon">🧠</span>
+                <div>
+                    <div class="drawer-title">VoidX AI™ Cyber Copilot</div>
+                    <div class="drawer-subtitle">70B MoE Active • 128k Context</div>
+                </div>
+            </div>
+            <div class="drawer-controls">
+                <button type="button" class="drawer-btn" id="btn-drawer-expand-studio" title="Expand to Full AI Studio">↗ Studio</button>
+                <button type="button" class="drawer-btn" id="btn-drawer-close" title="Close Drawer">✕</button>
+            </div>
+        </div>
+
+        <!-- Chat messages stream -->
+        <div class="drawer-chat-messages" id="drawer-chat-messages">
+            <div class="drawer-msg drawer-msg--ai">
+                <div class="drawer-msg-avatar">🧠</div>
+                <div class="drawer-msg-body">
+                    <strong>Greetings, Commander.</strong> I am VoidX AI 70B, your autonomous SOC intelligence model. How can I assist your mission?
+                    <div class="drawer-preset-chips" style="margin-top: 8px;">
+                        <button type="button" class="drawer-chip" data-prompt="Analyze LockBit 3.0 ransomware">LockBit 3.0</button>
+                        <button type="button" class="drawer-chip" data-prompt="Explain CVE-2024-38077 RCE">CVE-2024-38077</button>
+                        <button type="button" class="drawer-chip" data-prompt="Detect Cobalt Strike C2">Cobalt Strike</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drawer Input Footer -->
+        <div class="drawer-input-footer">
+            <input type="text" id="drawer-chat-input" class="drawer-chat-input" placeholder="Ask AI about threats, IOCs, CVEs, or YARA rules..." autocomplete="off">
+            <button type="button" class="drawer-send-btn" id="btn-drawer-send" aria-label="Send query">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══ Quick Incident Response & Containment Form Modal ═══ -->
+    <div class="qr-modal" id="quick-response-modal" role="dialog" aria-modal="true" style="display: none;">
+        <div class="qr-modal-backdrop" id="qr-modal-backdrop"></div>
+        <div class="qr-modal-dialog">
+            
+            <!-- Header -->
+            <div class="qr-modal-header">
+                <div class="qr-header-left">
+                    <div class="qr-header-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff3366" stroke-width="2.5">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="qr-modal-title">QUICK RESPONSE &amp; INCIDENT CONTAINMENT</h3>
+                        <p class="qr-modal-subtitle">High-speed emergency threat mitigation &amp; analyst escalation protocol</p>
+                    </div>
+                </div>
+                <button type="button" class="qr-close-btn" id="btn-close-qr-modal" aria-label="Close modal">✕</button>
+            </div>
+
+            <!-- Form Body -->
+            <form id="quick-response-form" class="qr-modal-body">
+                
+                <!-- Priority Level Selection -->
+                <div class="qr-form-group">
+                    <label class="qr-label">Emergency Incident Severity</label>
+                    <div class="qr-severity-options">
+                        <label class="qr-sev-option qr-sev--p1">
+                            <input type="radio" name="qr-severity" value="CRITICAL" checked>
+                            <span class="qr-sev-badge">🔴 P1 - CRITICAL</span>
+                            <span class="qr-sev-desc">Active Ransomware / Domain Breach</span>
+                        </label>
+                        <label class="qr-sev-option qr-sev--p2">
+                            <input type="radio" name="qr-severity" value="HIGH">
+                            <span class="qr-sev-badge">🟠 P2 - HIGH</span>
+                            <span class="qr-sev-desc">Data Exfiltration / C2 Beaconing</span>
+                        </label>
+                        <label class="qr-sev-option qr-sev--p3">
+                            <input type="radio" name="qr-severity" value="MEDIUM">
+                            <span class="qr-sev-badge">🟡 P3 - MEDIUM</span>
+                            <span class="qr-sev-desc">Phishing / Unauthorized Probe</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Grid Row: Target Asset & Threat Vector -->
+                <div class="qr-form-row">
+                    <div class="qr-form-group">
+                        <label for="qr-target-asset" class="qr-label">Target Asset / Hostname / IP <span class="qr-required">*</span></label>
+                        <input type="text" id="qr-target-asset" class="qr-input" placeholder="e.g. dc01.corp.internal or 192.168.1.50" required>
+                    </div>
+                    <div class="qr-form-group">
+                        <label for="qr-threat-type" class="qr-label">Threat Classification <span class="qr-required">*</span></label>
+                        <select id="qr-threat-type" class="qr-select" required>
+                            <option value="Ransomware Outbreak">Ransomware Outbreak (LockBit / BlackCat)</option>
+                            <option value="Cobalt Strike C2 Beacon">Cobalt Strike C2 Beacon</option>
+                            <option value="Data Exfiltration via DNS">Data Exfiltration via DNS</option>
+                            <option value="Pass-the-Hash / Kerberoast">Pass-the-Hash / Kerberoasting</option>
+                            <option value="Zero-Day Remote Code Execution">Zero-Day Remote Code Execution</option>
+                            <option value="DDoS Volumetric Ingress">DDoS Volumetric Ingress</option>
+                            <option value="Credential Stuffing Attack">Credential Stuffing Attack</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Attacker Source & Sector Row -->
+                <div class="qr-form-row">
+                    <div class="qr-form-group">
+                        <label for="qr-attacker-source" class="qr-label">Attacker Source IP / IOC Reference</label>
+                        <input type="text" id="qr-attacker-source" class="qr-input" placeholder="e.g. 185.220.101.45 (Tor Exit Node)">
+                    </div>
+                    <div class="qr-form-group">
+                        <label for="qr-sector" class="qr-label">Impacted Sector</label>
+                        <select id="qr-sector" class="qr-select">
+                            <option value="Financial Systems">Financial Systems &amp; Banking</option>
+                            <option value="Defense Infrastructure">Defense Infrastructure</option>
+                            <option value="Healthcare &amp; BioTech">Healthcare &amp; BioTech</option>
+                            <option value="Energy &amp; Power Grid">Energy &amp; Power Grid</option>
+                            <option value="Cloud Core Infrastructure">Cloud Core Infrastructure</option>
+                            <option value="Telecom &amp; Satellite">Telecom &amp; Satellite</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Containment Actions Checklist -->
+                <div class="qr-form-group">
+                    <label class="qr-label">Immediate Auto-Containment Actions</label>
+                    <div class="qr-checklist">
+                        <label class="qr-check-item">
+                            <input type="checkbox" id="qr-act-isolate" checked>
+                            <span>🔒 Immediately isolate host network interface</span>
+                        </label>
+                        <label class="qr-check-item">
+                            <input type="checkbox" id="qr-act-firewall" checked>
+                            <span>🛑 Inject source IP drop rule on border firewalls</span>
+                        </label>
+                        <label class="qr-check-item">
+                            <input type="checkbox" id="qr-act-revoke" checked>
+                            <span>🔑 Revoke active SSO sessions &amp; flush Kerberos tickets</span>
+                        </label>
+                        <label class="qr-check-item">
+                            <input type="checkbox" id="qr-act-alert-team" checked>
+                            <span>🚨 Broadcast high-priority alert to Incident Commander</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Notes / IOCs -->
+                <div class="qr-form-group">
+                    <label for="qr-incident-notes" class="qr-label">Brief Incident Description / Hash / IOCs</label>
+                    <textarea id="qr-incident-notes" class="qr-textarea" rows="2" placeholder="Enter file hashes, observed anomalous process names, or forensic observations..."></textarea>
+                </div>
+
+                <!-- Feedback status box -->
+                <div id="qr-feedback-status" class="qr-feedback" style="display: none;"></div>
+
+                <!-- Modal Footer Actions -->
+                <div class="qr-modal-footer">
+                    <button type="button" class="qr-btn-cancel" id="btn-cancel-qr">Cancel</button>
+                    <button type="submit" class="qr-btn-submit" id="btn-submit-qr">
+                        <span class="qr-submit-icon">⚡</span>
+                        <span>Dispatch Quick Response Now</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1708,6 +2642,7 @@
         <span class="toast-msg" id="toast-msg">Raw AI Telemetry Copied</span>
     </div>
 
+    <script src="/env.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="threats.js"></script>
     <script src="supabaseClient.js"></script>
